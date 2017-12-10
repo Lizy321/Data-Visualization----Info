@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style type="text/css">
+    body {
+      display: block;
+      margin: 0px;
+      overflow: hidden;
+      padding: 0px;
+    }
+  </style>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+  <script type="text/javascript" src="export.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+  <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
+</head>
+<body>
+<div id="container">
+
+
+  <form action="" method="get" id="frm" name="year_Form">
+    <select name="year_set" onchange="showSelectValue(this)">
+      <option selected="selected" value="2006">2006</option>
+      <option>2007</option>
+      <option>2008</option>
+      <option>2009</option>
+      <option>2010</option>
+      <option>2011</option>
+      <option>2012</option>
+      <option>2013</option>
+      <option>2014</option>
+      <option>2015</option>
+    </select>
+  </form>
+</div>
+<svg>
+  <radialGradient id="tip">
+    <stop offset="0" stop-color="white"/>
+    <stop offset="0.2" stop-color="pink"/>
+    <stop offset="1" stop-color="white"/>
+  </radialGradient>
+</svg>
+<script type="text/javascript">
+
+    var height = window.innerHeight * 1.8;
+    var width = window.innerWidth;
+    var svg = d3.select('#container').append('svg');
+
+    function showSelectValue() {
+
+
+        d3.json("world-countries.json", function (data) {
+            /* Antarctica will not shown on the map */
+            // var features = _.filter(data.features, function(value, key) {
+            //     return value;
+            // });
+
+            var group = svg.selectAll("g")
+                .data(data.features)
+                .enter()
+                .append("g")
+
+            var projection = d3.geo.mercator();
+            var oldScala = projection.scale();
+            var oldTranslate = projection.translate();
+
+            xy = projection.scale(oldScala * (width / oldTranslate[0] / 2) * 2.0)
+                .translate([width / 2 - 500, height / 2 + 300]); //CENTER
+
+
+            path = d3.geo.path().projection(xy);
+
+            svg.attr('width', width).attr('height', height);
+
+            //定义最小值和最大值对应的颜色
+            var a = d3.rgb(0, 255, 255);  //浅蓝色
+            var b = d3.rgb(0, 0, 255);    //蓝色
+
+            //颜色插值函数
+            var computeColor = d3.interpolate(a, b);
+
+            //直接读入js文件
+            // var ex_data = exportData.export;
+            // console.log(ex_data);
+
+            //从csv文件中读取数据！！！
+
+
+            //var textobj=document.getElementsByName('text');
+            var selectvalue = document.year_Form.year_set.value;
+            console.log(selectvalue);
+
+
+            d3.csv("total_" + selectvalue + ".csv", function (data) {
+
+                var ex = data;
+                //console.log(ex);
+
+
+                var maxvalue = d3.max(ex, function (d) {
+                    return d.export;
+                });
+                var minvalue = d3.min(ex, function (d) {
+                    return d.export;
+                });//ex_data, function(d){ return d.value; });
+                // console.log(maxvalue);
+                // console.log(minvalue);
+
+                //定义一个线性比例尺，将最小值和最大值之间的值映射到[0, 1]
+                var linear = d3.scale.linear()
+                    .domain([minvalue, maxvalue])
+                    .range([0, 1]);
+
+
+                var values = [];
+                for (var i = 0; i < ex.length; i++) {
+                    var country = ex[i].country;
+                    var value = ex[i].export;
+                    values[country] = value;
+                    //console.log(values[country]);
+                }
+                //console.log(exportData.length);
+
+                var areas = group.append("path")
+                    .attr("d", path)
+                    .attr("class", "area")
+                    .attr("fill", function (d) {
+                        var t = linear(values[d.id]);
+                        console.log(t);
+                        var color = computeColor(t);
+                        //console.log(color);
+                        if (color == "#NaNNaNNaN") {
+                            return "#efefef";
+                        }
+                        return color.toString();
+                    })//function(d){return color( )})
+                    .on('mouseout', function (data) {
+                        d3.select(this).attr('fill', 'steelblue');
+                    })
+                    .on('mouseover', function (data) {
+                        d3.select(this).attr('fill', 'rgba(2,2,139,0.61)');
+                    })
+
+                group.append("text")
+                    .attr("x", function (d) {
+                        return path.centroid(d)[0];
+                    })
+                    .attr("y", function (d) {
+                        return path.centroid(d)[1];
+                    })
+                    .attr("text-anchor", "middle")
+                    .text(function (d) {
+                        return d.id;
+                    })
+            });
+
+        });
+    }
+</script>
+</body>
+</html>
