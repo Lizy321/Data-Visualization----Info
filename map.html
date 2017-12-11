@@ -104,10 +104,10 @@
 
 
                 var maxvalue = d3.max(ex, function (d) {
-                    return d.export;
+                    return d.norm;
                 });
                 var minvalue = d3.min(ex, function (d) {
-                    return d.export;
+                    return d.norm;
                 });//ex_data, function(d){ return d.value; });
                 // console.log(maxvalue);
                 // console.log(minvalue);
@@ -121,7 +121,7 @@
                 var values = [];
                 for (var i = 0; i < ex.length; i++) {
                     var country = ex[i].country;
-                    var value = ex[i].export;
+                    var value = ex[i].norm;
                     values[country] = value;
                     //console.log(values[country]);
                 }
