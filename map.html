@@ -13,6 +13,7 @@
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
   <script type="text/javascript" src="export.js"></script>
+  <script type=text/javascript"  src="math.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
   <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
 </head>
@@ -21,17 +22,18 @@
 
 
   <form action="" method="get" id="frm" name="year_Form">
-    <select name="year_set" onchange="showSelectValue(this)">
-      <option selected="selected" value="2006">2006</option>
-      <option>2007</option>
-      <option>2008</option>
-      <option>2009</option>
-      <option>2010</option>
-      <option>2011</option>
-      <option>2012</option>
-      <option>2013</option>
-      <option>2014</option>
-      <option>2015</option>
+    <select id="year_set" onchange="showSelectValue()">
+      <option selected="selected" value="years"></option>
+      <option value = "2006">2006</option>
+      <option value = "2007">2007</option>
+      <option value ="2008">2008</option>
+      <option value = "2009">2009</option>
+      <option value = "2010">2010</option>
+      <option value = "2011">2011</option>
+      <option value = "2012">2012</option>
+      <option value = "2013">2013</option>
+      <option value = "2014">2014</option>
+      <option value = "2015">2015</option>
     </select>
   </form>
 </div>
@@ -49,6 +51,8 @@
     var svg = d3.select('#container').append('svg');
 
     function showSelectValue() {
+
+        var obj = document.getElementById('year_set');
 
 
         d3.json("world-countries.json", function (data) {
@@ -75,8 +79,8 @@
             svg.attr('width', width).attr('height', height);
 
             //定义最小值和最大值对应的颜色
-            var a = d3.rgb(0, 255, 255);  //浅蓝色
-            var b = d3.rgb(0, 0, 255);    //蓝色
+            var a = d3.rgb(173, 216, 230);  //浅蓝
+            var b = d3.rgb(0, 0, 255);    //
 
             //颜色插值函数
             var computeColor = d3.interpolate(a, b);
@@ -89,11 +93,11 @@
 
 
             //var textobj=document.getElementsByName('text');
-            var selectvalue = document.year_Form.year_set.value;
-            console.log(selectvalue);
+            //var selectvalue = obj.value;
+            //console.log(selectvalue);
 
 
-            d3.csv("total_" + selectvalue + ".csv", function (data) {
+            d3.csv("total_" + obj.value + ".csv", function (data) {
 
                 var ex = data;
                 //console.log(ex);
@@ -128,7 +132,6 @@
                     .attr("class", "area")
                     .attr("fill", function (d) {
                         var t = linear(values[d.id]);
-                        console.log(t);
                         var color = computeColor(t);
                         //console.log(color);
                         if (color == "#NaNNaNNaN") {
@@ -137,11 +140,21 @@
                         return color.toString();
                     })//function(d){return color( )})
                     .on('mouseout', function (data) {
-                        d3.select(this).attr('fill', 'steelblue');
+                        d3.select(this).attr('fill', function (d){
+                            var t = linear(values[d.id]);
+                            var color = computeColor(t);
+                            //console.log(color);
+                            if (color == "#NaNNaNNaN") {
+                                return "#efefef";
+                            }
+                            return color.toString();
+
+                        });
                     })
                     .on('mouseover', function (data) {
                         d3.select(this).attr('fill', 'rgba(2,2,139,0.61)');
                     })
+                    .attr('stroke','#0A0A0A')
 
                 group.append("text")
                     .attr("x", function (d) {
@@ -157,6 +170,7 @@
             });
 
         });
+        alert(obj.value);
     }
 </script>
 </body>
