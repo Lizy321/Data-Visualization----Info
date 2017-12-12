@@ -2,6 +2,18 @@
 <html>
 <head>
   <style type="text/css">
+    .tooltip{
+      font-family:simsun;
+      font-size:16px;
+      width: 120px;
+      height:auto;
+      position:absolute;
+      text-align:center;
+      border-style:solid;
+      border-width:1px;
+      background-color:white;
+      border-radius:5px;
+    }
     body {
       display: block;
       margin: 0px;
@@ -101,7 +113,9 @@
 
                 var ex = data;
                 //console.log(ex);
-
+                var tooltip = d3.select("body").append("div")
+                    .attr("class","tooltip") //用于css设置类样式
+                    .attr("opacity",0.0);
 
                 var maxvalue = d3.max(ex, function (d) {
                     return d.norm;
@@ -119,10 +133,13 @@
 
 
                 var values = [];
+                var norms =[];
                 for (var i = 0; i < ex.length; i++) {
                     var country = ex[i].country;
-                    var value = ex[i].norm;
+                    var value = ex[i].export;
+                    var norm  = ex[i].norm;
                     values[country] = value;
+                    norms[country] =norm;
                     //console.log(values[country]);
                 }
                 //console.log(exportData.length);
@@ -131,7 +148,7 @@
                     .attr("d", path)
                     .attr("class", "area")
                     .attr("fill", function (d) {
-                        var t = linear(values[d.id]);
+                        var t = linear(norms[d.id]);
                         var color = computeColor(t);
                         //console.log(color);
                         if (color == "#NaNNaNNaN") {
@@ -139,9 +156,9 @@
                         }
                         return color.toString();
                     })//function(d){return color( )})
-                    .on('mouseout', function (data) {
+                    .on('mouseout', function (datda) {
                         d3.select(this).attr('fill', function (d){
-                            var t = linear(values[d.id]);
+                            var t = linear(norms[d.id]);
                             var color = computeColor(t);
                             //console.log(color);
                             if (color == "#NaNNaNNaN") {
@@ -152,11 +169,17 @@
                         });
                     })
                     .on('mouseover', function (data) {
+                        //设置tooltip文字
+                        tooltip.html(data.id+":"+values[data.id])
+                        //设置tooltip的位置(left,top 相对于页面的距离)
+                            .style("left",(d3.event.pageX)+"px")
+                            .style("top",(d3.event.pageY+20)+"px")
+                            .style("opacity",1.0);
                         d3.select(this).attr('fill', 'rgba(2,2,139,0.61)');
                     })
                     .attr('stroke','#0A0A0A')
 
-                group.append("text")
+                /*group.append("titile")
                     .attr("x", function (d) {
                         return path.centroid(d)[0];
                     })
@@ -166,7 +189,7 @@
                     .attr("text-anchor", "middle")
                     .text(function (d) {
                         return d.id;
-                    })
+                    })*/
             });
 
         });
