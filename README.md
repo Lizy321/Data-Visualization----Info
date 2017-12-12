@@ -1,6 +1,13 @@
 D3-example
 ==========
 
+data压缩包里面是四个文件：
+
+ex_wld和im_wld分别是各个国家某一产品的所有年份数据，一个表里面对应的是 year～value
+
+all_country_ex和all_country_im分别是所有国家某一产品所有年份的数据，一个表里面是 country~value
+
+
 #### D3-example
 
 http://hellojinjie.github.io/D3-example/
