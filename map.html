@@ -158,6 +158,7 @@
                     })//function(d){return color( )})
                     .on('mouseout', function (datda) {
                         d3.select(this).attr('fill', function (d){
+                            tooltip.style("opacity",0.0);
                             var t = linear(norms[d.id]);
                             var color = computeColor(t);
                             //console.log(color);
