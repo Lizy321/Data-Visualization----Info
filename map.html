@@ -49,6 +49,8 @@
     var svg = d3.select('#container').append('svg');
 
     function showSelectValue() {
+		d3.selectAll("g")
+		.remove();
 
 
         d3.json("world-countries.json", function (data) {
@@ -137,7 +139,17 @@
                         return color.toString();
                     })//function(d){return color( )})
                     .on('mouseout', function (data) {
-                        d3.select(this).attr('fill', 'steelblue');
+                      d3.select(this).attr("fill", function (d) {
+                        var t = linear(values[d.id]);
+                        console.log(t);
+                        var color = computeColor(t);
+                        //console.log(color);
+                        if (color == "#NaNNaNNaN") {
+                            return "#efefef";
+                        }
+                        return color.toString();
+                    })
+					  //.attr('fill', 'rgba(0,120,0,0.61)');
                     })
                     .on('mouseover', function (data) {
                         d3.select(this).attr('fill', 'rgba(2,2,139,0.61)');
