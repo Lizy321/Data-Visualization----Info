@@ -2,6 +2,18 @@
 <html>
 <head>
   <style type="text/css">
+    .tooltip{
+      font-family:simsun;
+      font-size:16px;
+      width: 120px;
+      height:auto;
+      position:absolute;
+      text-align:center;
+      border-style:solid;
+      border-width:1px;
+      background-color:white;
+      border-radius:5px;
+    }
     body {
       display: block;
       margin: 0px;
@@ -13,6 +25,7 @@
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
   <script type="text/javascript" src="export.js"></script>
+  <script type=text/javascript"  src="math.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
   <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
 </head>
@@ -21,19 +34,36 @@
 
 
   <form action="" method="get" id="frm" name="year_Form">
-    <select name="year_set" onchange="showSelectValue(this)">
-      <option selected="selected" value="2006">2006</option>
-      <option>2007</option>
-      <option>2008</option>
-      <option>2009</option>
-      <option>2010</option>
-      <option>2011</option>
-      <option>2012</option>
-      <option>2013</option>
-      <option>2014</option>
-      <option>2015</option>
+    <select id="year_set" onchange="showSelectValue()">
+      <option selected="selected" value = "2006">2006</option>
+      <option value = "2007">2007</option>
+      <option value ="2008">2008</option>
+      <option value = "2009">2009</option>
+      <option value = "2010">2010</option>
+      <option value = "2011">2011</option>
+      <option value = "2012">2012</option>
+      <option value = "2013">2013</option>
+      <option value = "2014">2014</option>
+      <option value = "2015">2015</option>
     </select>
   </form>
+
+  <form action="" method="get" id="frm_product" name="year_Form">
+    <select id="product_set" onchange="showSelectValue()">
+      <option selected="selected" value = "Total" >Total</option>
+      <option value = "01-05_Animal">Animal</option>
+      <option value = "06-15_Vegetable">Vegetable</option>
+      <option value ="16-24_FoodProd">FoodProd</option>
+      <option value = "25-26_Minerals">Minerals</option>
+      <option value = "27-27_Fuels">Fuels</option>
+      <option value = "28-38_Chemicals">Chemicals</option>
+      <option value = "39-40_PlastiRub">PlastiRub</option>
+      <option value = "41-43_HidesSkin">HidesSkin</option>
+      <option value = "44-49_Wood">Wood</option>
+      <option value = "50-63_TextCloth">TextCloth</option>
+    </select>
+  </form>
+
 </div>
 <svg>
   <radialGradient id="tip">
@@ -48,10 +78,22 @@
     var width = window.innerWidth;
     var svg = d3.select('#container').append('svg');
 
-    function showSelectValue() {
-		d3.selectAll("g")
-		.remove();
+    function showProductSelectValue() {
+        var obj = document.getElementById('product_set');
+        console.log(obj.value);
+    }
 
+    function showSelectValue() {
+
+        var obj = document.getElementById('year_set');
+
+        var objProduct = document.getElementById('product_set');
+
+        d3.selectAll("g")
+            .remove();
+
+
+        //console.log(objProduct.value);
 
         d3.json("world-countries.json", function (data) {
             /* Antarctica will not shown on the map */
@@ -77,8 +119,9 @@
             svg.attr('width', width).attr('height', height);
 
             //定义最小值和最大值对应的颜色
-            var a = d3.rgb(0, 255, 255);  //浅蓝色
-            var b = d3.rgb(0, 0, 255);    //蓝色
+            var a = d3.rgb(0, 216, 230);  //浅蓝
+            //var a = d3.rgb(0,255,255);
+            var b = d3.rgb(0, 0, 255);    //
 
             //颜色插值函数
             var computeColor = d3.interpolate(a, b);
@@ -91,37 +134,42 @@
 
 
             //var textobj=document.getElementsByName('text');
-            var selectvalue = document.year_Form.year_set.value;
-            console.log(selectvalue);
+            //var selectvalue = obj.value;
+            //console.log(selectvalue);
 
 
-            d3.csv("total_" + selectvalue + ".csv", function (data) {
+            d3.csv( "all_country_export/"+objProduct.value+"_" +obj.value+ ".csv", function (data) {
 
                 var ex = data;
-                //console.log(ex);
-
+                console.log(ex);
+                var tooltip = d3.select("body").append("div")
+                    .attr("class","tooltip") //用于css设置类样式
+                    .attr("opacity",0.0);
 
                 var maxvalue = d3.max(ex, function (d) {
-                    return d.export;
+                    return d.value;
                 });
                 var minvalue = d3.min(ex, function (d) {
-                    return d.export;
+                    return d.value;
                 });//ex_data, function(d){ return d.value; });
-                // console.log(maxvalue);
-                // console.log(minvalue);
+                 console.log(maxvalue);
+                 console.log(minvalue);
 
                 //定义一个线性比例尺，将最小值和最大值之间的值映射到[0, 1]
                 var linear = d3.scale.linear()
-                    .domain([minvalue, maxvalue])
+                    .domain([Math.log(minvalue), Math.log(maxvalue)])
                     .range([0, 1]);
 
 
                 var values = [];
+                var norms =[];
                 for (var i = 0; i < ex.length; i++) {
                     var country = ex[i].country;
-                    var value = ex[i].export;
+                    var value = ex[i].value;
+                    var norm  = ex[i].norm;
                     values[country] = value;
-                    //console.log(values[country]);
+                    norms[country] =norm;
+                    console.log(values[country]);
                 }
                 //console.log(exportData.length);
 
@@ -129,8 +177,7 @@
                     .attr("d", path)
                     .attr("class", "area")
                     .attr("fill", function (d) {
-                        var t = linear(values[d.id]);
-                        console.log(t);
+                        var t = linear(Math.log(values[d.id]));
                         var color = computeColor(t);
                         //console.log(color);
                         if (color == "#NaNNaNNaN") {
@@ -138,24 +185,31 @@
                         }
                         return color.toString();
                     })//function(d){return color( )})
-                    .on('mouseout', function (data) {
-                      d3.select(this).attr("fill", function (d) {
-                        var t = linear(values[d.id]);
-                        console.log(t);
-                        var color = computeColor(t);
-                        //console.log(color);
-                        if (color == "#NaNNaNNaN") {
-                            return "#efefef";
-                        }
-                        return color.toString();
-                    })
-					  //.attr('fill', 'rgba(0,120,0,0.61)');
+                    .on('mouseout', function (datda) {
+                        d3.select(this).attr('fill', function (d){
+                            tooltip.style("opacity",0.0);
+                            var t = linear(Math.log(values[d.id]));
+                            var color = computeColor(t);
+                            //console.log(color);
+                            if (color == "#NaNNaNNaN") {
+                                return "#efefef";
+                            }
+                            return color.toString();
+
+                        });
                     })
                     .on('mouseover', function (data) {
+                        //设置tooltip文字
+                        tooltip.html(data.id+":"+values[data.id])
+                        //设置tooltip的位置(left,top 相对于页面的距离)
+                            .style("left",(d3.event.pageX)+"px")
+                            .style("top",(d3.event.pageY+20)+"px")
+                            .style("opacity",1.0);
                         d3.select(this).attr('fill', 'rgba(2,2,139,0.61)');
                     })
+                    .attr('stroke','#0A0A0A')
 
-                group.append("text")
+                /*group.append("titile")
                     .attr("x", function (d) {
                         return path.centroid(d)[0];
                     })
@@ -165,10 +219,11 @@
                     .attr("text-anchor", "middle")
                     .text(function (d) {
                         return d.id;
-                    })
+                    })*/
             });
 
         });
+        //alert(obj.value);
     }
 </script>
 </body>
