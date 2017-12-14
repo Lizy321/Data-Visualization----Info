@@ -65,6 +65,8 @@
     function showSelectValue() {
 
         var obj = document.getElementById('year_set');
+        d3.selectAll("g")
+            .remove();
 
 
         d3.json("world-countries.json", function (data) {
