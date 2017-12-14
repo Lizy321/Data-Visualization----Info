@@ -35,8 +35,7 @@
 
   <form action="" method="get" id="frm" name="year_Form">
     <select id="year_set" onchange="showSelectValue()">
-      <option selected="selected" value = "2006">2006</option>
-      <option value = "2007">2007</option>
+      <option selected="selected" value = "2007">2007</option>
       <option value ="2008">2008</option>
       <option value = "2009">2009</option>
       <option value = "2010">2010</option>
@@ -45,6 +44,7 @@
       <option value = "2013">2013</option>
       <option value = "2014">2014</option>
       <option value = "2015">2015</option>
+      <option value = "2016">2016</option>
     </select>
   </form>
 
@@ -141,7 +141,7 @@
             d3.csv( "all_country_export/"+objProduct.value+"_" +obj.value+ ".csv", function (data) {
 
                 var ex = data;
-                console.log(ex);
+                //console.log(ex);
                 var tooltip = d3.select("body").append("div")
                     .attr("class","tooltip") //用于css设置类样式
                     .attr("opacity",0.0);
@@ -152,6 +152,8 @@
                 var minvalue = d3.min(ex, function (d) {
                     return d.value;
                 });//ex_data, function(d){ return d.value; });
+                console.log(obj.value);
+                console.log(objProduct.value);
                  console.log(maxvalue);
                  console.log(minvalue);
 
@@ -169,7 +171,7 @@
                     var norm  = ex[i].norm;
                     values[country] = value;
                     norms[country] =norm;
-                    console.log(values[country]);
+                    //console.log(values[country]);
                 }
                 //console.log(exportData.length);
 
