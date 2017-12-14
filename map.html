@@ -111,7 +111,7 @@
             var oldTranslate = projection.translate();
 
             xy = projection.scale(oldScala * (width / oldTranslate[0] / 2) * 2.0)
-                .translate([width / 2 - 500, height / 2 + 300]); //CENTER
+                .translate([width / 2 - 500, height / 2 + 100]); //CENTER
 
 
             path = d3.geo.path().projection(xy);
@@ -211,17 +211,52 @@
                     })
                     .attr('stroke','#0A0A0A')
 
-                /*group.append("titile")
-                    .attr("x", function (d) {
-                        return path.centroid(d)[0];
-                    })
-                    .attr("y", function (d) {
-                        return path.centroid(d)[1];
-                    })
-                    .attr("text-anchor", "middle")
-                    .text(function (d) {
-                        return d.id;
-                    })*/
+                //定义一个线性渐变
+                var defs = svg.append("defs");
+
+                var linearGradient = defs.append("linearGradient")
+                    .attr("id","linearColor")
+                    .attr("x1","0%")
+                    .attr("y1","0%")
+                    .attr("x2","100%")
+                    .attr("y2","0%");
+
+                var stop1 = linearGradient.append("stop")
+                    .attr("offset","0%")
+                    .style("stop-color",a.toString());
+
+                var stop2 = linearGradient.append("stop")
+                    .attr("offset","100%")
+                    .style("stop-color",b.toString());
+
+                //添加一个矩形，并应用线性渐变
+                var colorRect = svg.append("rect")
+                    .attr("x", 20)
+                    .attr("y", 550)
+                    .attr("width", 140)
+                    .attr("height", 20)
+                    .style("fill","url(#" + linearGradient.attr("id") + ")");
+
+                //添加文字
+                d3.selectAll("text")
+                    .remove();
+                var minValueText = svg.append("text")
+                    .attr("class","valueText")
+                    .attr("x", 20)
+                    .attr("y", 540)
+                    .attr("dy", "-0.3em")
+                    .text(function(){
+                        return minvalue;
+                    });
+
+                var maxValueText = svg.append("text")
+                    .attr("class","valueText")
+                    .attr("x", 160)
+                    .attr("y", 540)
+                    .attr("dy", "-0.3em")
+                    .text(function(){
+                        return maxvalue;
+                    });
             });
 
         });
