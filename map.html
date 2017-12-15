@@ -77,6 +77,13 @@
     var height = window.innerHeight * 1.8;
     var width = window.innerWidth;
     var svg = d3.select('#container').append('svg');
+	var width2 = 500;
+    var height2 = 500;
+    svg.attr("width", width2)
+    .attr("height", height2)
+    .style('position', 'absolute')
+     .style('top', '40')
+     .style('left', '0');
 
     function showProductSelectValue() {
         var obj = document.getElementById('product_set');
@@ -240,7 +247,7 @@
                             .attr("height", height2)
                             .style('position', 'absolute')
                             .style('top', '0')
-                            .style('right', '0')
+                            .style('left', '800');
 					var pie=d3.layout.pie();
 					var piedata=pie(showdata);
 					piedata[0].data="Animal";
