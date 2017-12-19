@@ -65,7 +65,6 @@
   </form>
 
 </div>
-<div id="chart1"></div>
 
 <svg>
   <radialGradient id="tip">
@@ -82,6 +81,7 @@
     var height2 = 500;
     svg.attr("width", width2)
         .attr("height", height2)
+        .attr("id","thisone")
         .style('position', 'absolute')
         .style('top', '40')
         .style('left', '0');
@@ -90,6 +90,25 @@
         console.log(obj.value);
     }
 
+
+    var marginTop = 350;
+    var marginBottom = 30;
+    var marginRight = 50;
+    var marginLeft = 180;
+    var height_stream = 580 - marginTop - marginBottom;
+    var width_stream = 680 - marginLeft - marginRight;
+    console.log(height_stream,width_stream);
+
+
+    var svgSelection = d3.select('#container')
+        .append("svg")
+        .attr("id","stream")
+        .attr("width", width_stream + marginLeft + marginRight)
+        .attr("height", height_stream + marginTop + marginBottom)
+        .style('position', 'absolute')
+        .style('top', 0)
+        .style('left', 650);
+    //console.log(width_stream + marginLeft + marginRight,height_stream + marginTop + marginBottom);
 
 
 
