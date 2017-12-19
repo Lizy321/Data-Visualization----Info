@@ -34,7 +34,10 @@ function showSelectValue() {
         //var textobj=document.getElementsByName('text');
         //var selectvalue = obj.value;
         //console.log(selectvalue);
+
         d3.csv( "all_country_export/"+objProduct.value+"_" +obj.value+ ".csv", function (data) {
+
+
             var ex = data;
             //console.log(ex);
             var tooltip = d3.select("body").append("div")
@@ -71,7 +74,7 @@ function showSelectValue() {
                 }
             }
             //console.log(norms);
-            console.log(normArray);
+            //console.log(normArray);
             var min = d3.min(normArray);
             var max = d3.max(normArray);
             var linear = d3.scale.linear()
@@ -118,6 +121,30 @@ function showSelectValue() {
                     var year = document.getElementById('year_set');
                     console.log(year.value);
                     d3.csv( "all_product_export/"+data.id+"_all_product_ex.csv", function (productdata) {
+
+                        d3.select('#container').select('#stream').remove();
+
+                        d3.select('#container').select('#svg2').remove();
+
+                        var svg2 = d3.select('#container').append('svg');
+                        var width2 = 500;
+                        var height2 = 500;
+                        svg2.attr("width", width2)
+                            .attr("height", height2)
+                            .attr("id","svg2")
+                            .style('position', 'absolute')
+                            .style('top', '500')
+                            .style('left', '800');
+
+                        var svgSelection = d3.select('#container')
+                            .append("svg")
+                            .attr("id","stream")
+                            .attr("width", width_stream + marginLeft + marginRight)
+                            .attr("height", height_stream + marginTop + marginBottom)
+                            .style('position', 'absolute')
+                            .style('top', 0)
+                            .style('left', 550);
+
                         for (var i = 0; i < ex.length; i++) {
                             if(year.value==productdata[i].year){
                                 var showdata=[];
@@ -138,26 +165,12 @@ function showSelectValue() {
 
                         //堆叠面积图的大小
 
-                        var marginTop = 10;
-                        var marginBottom = 20;
-                        var marginRight = 15;
-                        var marginLeft = 130;
-                        var height_stream = 280 - marginTop - marginBottom;
-                        var width_stream = 580 - marginLeft - marginRight;
-                        console.log(height_stream,width_stream);
 
-                        var svgSelection = d3.select('#chart1')
-                            .append("svg")
-                            .attr("width", width_stream + marginLeft + marginRight)
-                            .attr("height", height_stream + marginTop + marginBottom)
-                            .style('position', 'absolute')
-                            .style('top', 0)
-                            .style('left', 550);
-                        console.log(width_stream + marginLeft + marginRight,height_stream + marginTop + marginBottom);
 
                         var baseGroup = svgSelection
                             .append("g")
                             .attr("transform", "translate("+marginLeft+","+marginTop+")");
+
 
 
                         var min = d3.min(normArray);
@@ -236,14 +249,7 @@ function showSelectValue() {
                             .attr("d", function(d) { return area(d); });
 
 
-                        var svg2 = d3.select('#container').append('svg');
-                        var width2 = 500;
-                        var height2 = 500;
-                        svg2.attr("width", width2)
-                            .attr("height", height2)
-                            .style('position', 'absolute')
-                            .style('top', '500')
-                            .style('left', '800');
+
                         var pie=d3.layout.pie();
                         var piedata=pie(showdata);
                         piedata[0].data="Animal";
@@ -257,7 +263,7 @@ function showSelectValue() {
                         piedata[8].data="Wood";
                         piedata[9].data="TextCloth";
 
-                        console.log(piedata);
+                        //console.log(piedata);
                         var outerRadius = 200; //外半径
                         var innerRadius = 0; //内半径，为0则中间没有空白
                         var arc = d3.svg.arc()  //弧生成器
