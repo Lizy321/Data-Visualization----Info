@@ -25,7 +25,7 @@
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
   <script type="text/javascript" src="export.js"></script>
-  <script type=text/javascript"  src="math.js"></script>
+  <script type="text/javascript"  src="math.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
   <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
 </head>
@@ -35,9 +35,7 @@
 
   <form action="" method="get" id="frm" name="year_Form">
     <select id="year_set" onchange="showSelectValue()">
-      <option selected="selected" value="years"></option>
-      <option value = "2006">2006</option>
-      <option value = "2007">2007</option>
+      <option selected="selected" value = "2007">2007</option>
       <option value ="2008">2008</option>
       <option value = "2009">2009</option>
       <option value = "2010">2010</option>
@@ -46,9 +44,28 @@
       <option value = "2013">2013</option>
       <option value = "2014">2014</option>
       <option value = "2015">2015</option>
+      <option value = "2016">2016</option>
     </select>
   </form>
+
+  <form action="" method="get" id="frm_product" name="year_Form">
+    <select id="product_set" onchange="showSelectValue()">
+      <option selected="selected" value = "Total" >Total</option>
+      <option value = "01-05_Animal">Animal</option>
+      <option value = "06-15_Vegetable">Vegetable</option>
+      <option value ="16-24_FoodProd">FoodProd</option>
+      <option value = "25-26_Minerals">Minerals</option>
+      <option value = "27-27_Fuels">Fuels</option>
+      <option value = "28-38_Chemicals">Chemicals</option>
+      <option value = "39-40_PlastiRub">PlastiRub</option>
+      <option value = "41-43_HidesSkin">HidesSkin</option>
+      <option value = "44-49_Wood">Wood</option>
+      <option value = "50-63_TextCloth">TextCloth</option>
+    </select>
+  </form>
+
 </div>
+
 <svg>
   <radialGradient id="tip">
     <stop offset="0" stop-color="white"/>
@@ -57,147 +74,46 @@
   </radialGradient>
 </svg>
 <script type="text/javascript">
-
     var height = window.innerHeight * 1.8;
     var width = window.innerWidth;
     var svg = d3.select('#container').append('svg');
-
-    function showSelectValue() {
-
-        var obj = document.getElementById('year_set');
-        d3.selectAll("g")
-            .remove();
-
-
-        d3.json("world-countries.json", function (data) {
-            /* Antarctica will not shown on the map */
-            // var features = _.filter(data.features, function(value, key) {
-            //     return value;
-            // });
-
-            var group = svg.selectAll("g")
-                .data(data.features)
-                .enter()
-                .append("g")
-
-            var projection = d3.geo.mercator();
-            var oldScala = projection.scale();
-            var oldTranslate = projection.translate();
-
-            xy = projection.scale(oldScala * (width / oldTranslate[0] / 2) * 2.0)
-                .translate([width / 2 - 500, height / 2 + 300]); //CENTER
-
-
-            path = d3.geo.path().projection(xy);
-
-            svg.attr('width', width).attr('height', height);
-
-            //定义最小值和最大值对应的颜色
-            var a = d3.rgb(173, 216, 230);  //浅蓝
-            var b = d3.rgb(0, 0, 255);    //
-
-            //颜色插值函数
-            var computeColor = d3.interpolate(a, b);
-
-            //直接读入js文件
-            // var ex_data = exportData.export;
-            // console.log(ex_data);
-
-            //从csv文件中读取数据！！！
-
-
-            //var textobj=document.getElementsByName('text');
-            //var selectvalue = obj.value;
-            //console.log(selectvalue);
-
-
-            d3.csv("total_" + obj.value + ".csv", function (data) {
-
-                var ex = data;
-                //console.log(ex);
-                var tooltip = d3.select("body").append("div")
-                    .attr("class","tooltip") //用于css设置类样式
-                    .attr("opacity",0.0);
-
-                var maxvalue = d3.max(ex, function (d) {
-                    return d.norm;
-                });
-                var minvalue = d3.min(ex, function (d) {
-                    return d.norm;
-                });//ex_data, function(d){ return d.value; });
-                // console.log(maxvalue);
-                // console.log(minvalue);
-
-                //定义一个线性比例尺，将最小值和最大值之间的值映射到[0, 1]
-                var linear = d3.scale.linear()
-                    .domain([minvalue, maxvalue])
-                    .range([0, 1]);
-
-
-                var values = [];
-                var norms =[];
-                for (var i = 0; i < ex.length; i++) {
-                    var country = ex[i].country;
-                    var value = ex[i].export;
-                    var norm  = ex[i].norm;
-                    values[country] = value;
-                    norms[country] =norm;
-                    //console.log(values[country]);
-                }
-                //console.log(exportData.length);
-
-                var areas = group.append("path")
-                    .attr("d", path)
-                    .attr("class", "area")
-                    .attr("fill", function (d) {
-                        var t = linear(norms[d.id]);
-                        var color = computeColor(t);
-                        //console.log(color);
-                        if (color == "#NaNNaNNaN") {
-                            return "#efefef";
-                        }
-                        return color.toString();
-                    })//function(d){return color( )})
-                    .on('mouseout', function (datda) {
-                        d3.select(this).attr('fill', function (d){
-                            tooltip.style("opacity",0.0);
-                            var t = linear(norms[d.id]);
-                            var color = computeColor(t);
-                            //console.log(color);
-                            if (color == "#NaNNaNNaN") {
-                                return "#efefef";
-                            }
-                            return color.toString();
-
-                        });
-                    })
-                    .on('mouseover', function (data) {
-                        //设置tooltip文字
-                        tooltip.html(data.id+":"+values[data.id])
-                        //设置tooltip的位置(left,top 相对于页面的距离)
-                            .style("left",(d3.event.pageX)+"px")
-                            .style("top",(d3.event.pageY+20)+"px")
-                            .style("opacity",1.0);
-                        d3.select(this).attr('fill', 'rgba(2,2,139,0.61)');
-                    })
-                    .attr('stroke','#0A0A0A')
-
-                /*group.append("titile")
-                    .attr("x", function (d) {
-                        return path.centroid(d)[0];
-                    })
-                    .attr("y", function (d) {
-                        return path.centroid(d)[1];
-                    })
-                    .attr("text-anchor", "middle")
-                    .text(function (d) {
-                        return d.id;
-                    })*/
-            });
-
-        });
-        alert(obj.value);
+    var width2 = 500;
+    var height2 = 500;
+    svg.attr("width", width2)
+        .attr("height", height2)
+        .attr("id","thisone")
+        .style('position', 'absolute')
+        .style('top', '40')
+        .style('left', '0');
+    function showProductSelectValue() {
+        var obj = document.getElementById('product_set');
+        console.log(obj.value);
     }
+
+
+    var marginTop = 50;
+    var marginBottom = 30;
+    var marginRight = 50;
+    var marginLeft = 180;
+    var height_stream = 580 - marginTop - marginBottom;
+    var width_stream = 780 - marginLeft - marginRight;
+    console.log(height_stream,width_stream);
+
+
+    var svgSelection = d3.select('#container')
+        .append("svg")
+        .attr("id","stream")
+        .attr("width", width_stream + marginLeft + marginRight)
+        .attr("height", height_stream + marginTop + marginBottom)
+        .style('position', 'absolute')
+        .style('top', 500)
+        .style('left', 650);
+    //console.log(width_stream + marginLeft + marginRight,height_stream + marginTop + marginBottom);
+
+
+
+
 </script>
+<script type="text/javascript" src="select.js"></script>
 </body>
 </html>
