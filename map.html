@@ -96,6 +96,10 @@
   </form>
 
 </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2508d13506f308617c83500d4e4c89ca89b35965
 <svg>
   <radialGradient id="tip">
     <stop offset="0" stop-color="white"/>
@@ -113,6 +117,7 @@
     svg.attr("width", width2)
 		.attr("id","svg1")
         .attr("height", height2)
+        .attr("id","thisone")
         .style('position', 'absolute')
         .style('top', '40')
         .style('left', '0');
@@ -519,6 +524,7 @@
 					.attr("opacity",0.0);
 				//====
 
+<<<<<<< HEAD
                 var values = [];
                 var valueArray = [];
                 var norms =[];
@@ -552,6 +558,27 @@
                 var linear = d3.scale.linear()
                     .domain([min, max])
                     .range([0, 1]);
+=======
+    var marginTop = 350;
+    var marginBottom = 30;
+    var marginRight = 50;
+    var marginLeft = 180;
+    var height_stream = 580 - marginTop - marginBottom;
+    var width_stream = 680 - marginLeft - marginRight;
+    console.log(height_stream,width_stream);
+
+
+    var svgSelection = d3.select('#container')
+        .append("svg")
+        .attr("id","stream")
+        .attr("width", width_stream + marginLeft + marginRight)
+        .attr("height", height_stream + marginTop + marginBottom)
+        .style('position', 'absolute')
+        .style('top', 0)
+        .style('left', 650);
+    //console.log(width_stream + marginLeft + marginRight,height_stream + marginTop + marginBottom);
+
+>>>>>>> 2508d13506f308617c83500d4e4c89ca89b35965
 
                 //console.log(exportData.length);
                 var areas = group.selectAll("path")

@@ -34,7 +34,10 @@ function showSelectValue() {
         //var textobj=document.getElementsByName('text');
         //var selectvalue = obj.value;
         //console.log(selectvalue);
+
         d3.csv( "all_country_export/"+objProduct.value+"_" +obj.value+ ".csv", function (data) {
+
+
             var ex = data;
             //console.log(ex);
             var tooltip = d3.select("body").append("div")
@@ -71,7 +74,7 @@ function showSelectValue() {
                 }
             }
             //console.log(norms);
-            console.log(normArray);
+            //console.log(normArray);
             var min = d3.min(normArray);
             var max = d3.max(normArray);
             var linear = d3.scale.linear()
@@ -118,6 +121,30 @@ function showSelectValue() {
                     var year = document.getElementById('year_set');
                     console.log(year.value);
                     d3.csv( "all_product_export/"+data.id+"_all_product_ex.csv", function (productdata) {
+
+                        d3.select('#container').select('#stream').remove();
+
+                        d3.select('#container').select('#svg2').remove();
+
+                        var svg2 = d3.select('#container').append('svg');
+                        var width2 = 500;
+                        var height2 = 500;
+                        svg2.attr("width", width2)
+                            .attr("height", height2)
+                            .attr("id","svg2")
+                            .style('position', 'absolute')
+                            .style('top', '500')
+                            .style('left', '800');
+
+                        var svgSelection = d3.select('#container')
+                            .append("svg")
+                            .attr("id","stream")
+                            .attr("width", width_stream + marginLeft + marginRight)
+                            .attr("height", height_stream + marginTop + marginBottom)
+                            .style('position', 'absolute')
+                            .style('top', 0)
+                            .style('left', 650);
+
                         for (var i = 0; i < ex.length; i++) {
                             if(year.value==productdata[i].year){
                                 var showdata=[];
@@ -138,43 +165,49 @@ function showSelectValue() {
 
                         //堆叠面积图的大小
 
-                        var marginTop = 10;
-                        var marginBottom = 20;
-                        var marginRight = 15;
-                        var marginLeft = 130;
-                        var height_stream = 280 - marginTop - marginBottom;
-                        var width_stream = 580 - marginLeft - marginRight;
-                        console.log(height_stream,width_stream);
+                        var parseDate = d3.time.format("%Y").parse;
+                        productdata.forEach(function(d) {
+                            d.year = parseDate(d.year);
+                        });
+                        
 
-                        var svgSelection = d3.select('#chart1')
-                            .append("svg")
-                            .attr("width", width_stream + marginLeft + marginRight)
-                            .attr("height", height_stream + marginTop + marginBottom)
-                            .style('position', 'absolute')
-                            .style('top', 0)
-                            .style('left', 550);
-                        console.log(width_stream + marginLeft + marginRight,height_stream + marginTop + marginBottom);
+                        var newDataset = ["01-05_Animal","06-15_Vegetable","16-24_FoodProd","25-26_Minerals","27-27_Fuels","28-38_Chemicals","39-40_PlastiRub","41-43_HidesSkin","44-49_Wood","50-63_TextCloth"].map(function(n){
+                            return productdata.map(function(d, i){
+                                return { x: d.year, y: Number(d[n]), y0: 0 };
+                            });
+                        });
+
+                        //d3.layout.stack()(newDataset);
+
+                        console.log(newDataset);
 
                         var baseGroup = svgSelection
                             .append("g")
                             .attr("transform", "translate("+marginLeft+","+marginTop+")");
 
 
-                        var min = d3.min(normArray);
-                        var max = d3.max(normArray);
-                        var linear = d3.scale.linear()
-                            .domain([min, max])
-                            .range([0, 1]);
+                        // var min = d3.min(productdata);
+                        // var max = d3.max(normArray);
+                        // var linear = d3.scale.linear()
+                        //     .domain([min, max])
+                        //     .range([0, 1]);
+
+                        var maxHeight=d3.max(newDataset, function(d) {
+                            return d3.max(d, function(d) { return d.y0 + d.y; });
+                        });
 
                         var yScale = d3.scale.linear()
-                            .range([height_stream,0])
-                            .domain([0,100]);
+                            .domain([maxHeight,0])
+                            .range([0, 100]);
+
+                        var colors = d3.scale.category20();
+
 
                         var xScale = d3.time.scale()
                             .range([0, width_stream]);
 
                         var colorScale = d3.scale.ordinal()
-                            .range(["#F37B6D", "#FFD900"]);//"#F37B6D", "#6CC071",
+                            .range(["#F37B6D", "#6CC071"]);//"#F37B6D", "#6CC071",
 
                         var hoverLabel = d3.scale.ordinal()
                             .range(["01-05_Animal","06-15_Vegetable","16-24_FoodProd","25-26_Minerals","27-27_Fuels","28-38_Chemicals","39-40_PlastiRub","41-43_HidesSkin","44-49_Wood","50-63_TextCloth"]);
@@ -192,20 +225,9 @@ function showSelectValue() {
                             .orient("bottom");
 
 
-                        var parseDate = d3.time.format("%Y").parse;
-                        productdata.forEach(function(d) {
-                            d.year = parseDate(d.year);
-                        });
-
-                        var newDataset = ["01-05_Animal","06-15_Vegetable","16-24_FoodProd","25-26_Minerals","27-27_Fuels","28-38_Chemicals","39-40_PlastiRub","41-43_HidesSkin","44-49_Wood","50-63_TextCloth"].map(function(n){
-                            return productdata.map(function(d, i){
-                                return { x: d.year, y: d[n], y0: 0 };
-                            });
-                        });
-
+                        d3.layout.stack()(newDataset);
                         //console.log(newDataset);
 
-                        d3.layout.stack()(newDataset);
 
                         xScale.domain(d3.extent(productdata, function(d) { return d.year }))
 
@@ -229,21 +251,14 @@ function showSelectValue() {
                             .enter()
                             .append("g")
                             .attr("class", "valgroup")
-                            .style("fill", function(d, i) { return colorScale(i); })
+                            .style("fill", function(d, i) { return colors(i);})//colorScale(i); })
                             .attr("class", function(d, i) { return hoverLabel(i); });
 
                         ageGroup.append("path")
                             .attr("d", function(d) { return area(d); });
 
 
-                        var svg2 = d3.select('#container').append('svg');
-                        var width2 = 500;
-                        var height2 = 500;
-                        svg2.attr("width", width2)
-                            .attr("height", height2)
-                            .style('position', 'absolute')
-                            .style('top', '500')
-                            .style('left', '800');
+
                         var pie=d3.layout.pie();
                         var piedata=pie(showdata);
                         piedata[0].data="Animal";
@@ -257,7 +272,7 @@ function showSelectValue() {
                         piedata[8].data="Wood";
                         piedata[9].data="TextCloth";
 
-                        console.log(piedata);
+                        //console.log(piedata);
                         var outerRadius = 200; //外半径
                         var innerRadius = 0; //内半径，为0则中间没有空白
                         var arc = d3.svg.arc()  //弧生成器
