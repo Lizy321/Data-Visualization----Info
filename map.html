@@ -1,587 +1,596 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <style type="text/css">
-            .tooltip {
-                font-family: simsun;
-                font-size: 16px;
-                width: 140px;
-                height: auto;
-                position: absolute;
-                text-align: center;
-                border-style: solid;
-                border-width: 1px;
-                background-color: white;
-                border-radius: 5px;
+<head>
+  <style type="text/css">
+    .tooltip {
+      font-family: simsun;
+      font-size: 16px;
+      width: 140px;
+      height: auto;
+      position: absolute;
+      text-align: center;
+      border-style: solid;
+      border-width: 1px;
+      background-color: white;
+      border-radius: 5px;
+    }
+    body {
+      display: block;
+      margin: 0px;
+      overflow: hidden;
+      padding: 0px;
+    }
+  </style>
+  <style type="text/css">
+    .tooltip2 {
+      font-size: 13px;
+      height: auto;
+      width=auto; position: absolute;
+      text-align: center;
+    }
+  </style>
+  <style type="text/css">
+    .tooltip3 {
+      font-family: simsun;
+      font-size: 16px;
+      width: 140px;
+      height: 100px;
+      position: absolute;
+      text-align: center;
+      border-style: solid;
+      border-width: 3px;
+      background-color: blue;
+      border-radius: 5px;
+    }
+    body {
+      display: block;
+      margin: 0px;
+      overflow: hidden;
+      padding: 0px;
+    }
+  </style>
+  <script charset="utf-8" src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+  <script src="export.js" type="text/javascript"></script>
+  <script src="math.js" type="text/javascript"></script>
+  <script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script>
+  <script src="http://underscorejs.org/underscore-min.js" type="text/javascript"></script>
+  <title></title>
+</head>
+<body>
+<div id="container">
+  <form action="" id="frm" method="get" name="year_Form">
+    <select id="year_set" onchange="showSelectValue()">
+      <option selected="selected" value="2007">2007
+      </option>
+      <option value="2008">2008
+      </option>
+      <option value="2009">2009
+      </option>
+      <option value="2010">2010
+      </option>
+      <option value="2011">2011
+      </option>
+      <option value="2012">2012
+      </option>
+      <option value="2013">2013
+      </option>
+      <option value="2014">2014
+      </option>
+      <option value="2015">2015
+      </option>
+      <option value="2016">2016
+      </option>
+    </select>
+  </form>
+  <form action="" id="frm_product" method="get" name="year_Form">
+    <select id="product_set" onchange="showSelectValue()">
+      <option selected="selected" value="Total">Total
+      </option>
+      <option value="01-05_Animal">Animal
+      </option>
+      <option value="06-15_Vegetable">Vegetable
+      </option>
+      <option value="16-24_FoodProd">FoodProd
+      </option>
+      <option value="25-26_Minerals">Minerals
+      </option>
+      <option value="27-27_Fuels">Fuels
+      </option>
+      <option value="28-38_Chemicals">Chemicals
+      </option>
+      <option value="39-40_PlastiRub">PlastiRub
+      </option>
+      <option value="41-43_HidesSkin">HidesSkin
+      </option>
+      <option value="44-49_Wood">Wood
+      </option>
+      <option value="50-63_TextCloth">TextCloth
+      </option>
+    </select>
+  </form>
+</div>
+<svg>
+  <radialgradient id="tip">
+    <stop offset="0" stop-color="white"></stop>
+    <stop offset="0.2" stop-color="pink"></stop>
+    <stop offset="1" stop-color="white"></stop>
+  </radialgradient>
+</svg>
+<script type="text/javascript">
+
+
+    var marginTop = 30;
+    var marginBottom = 30;
+    var marginRight = 50;
+    var marginLeft = 50;
+    var height_stream = 380 - marginTop - marginBottom;
+    var width_stream = 600 - marginLeft - marginRight;
+    var height = window.innerHeight * 1.8;
+    var width = window.innerWidth;
+    //creating svg to draw map
+    //with id 'svg1'
+    var svg = d3.select('#container')
+        .append('svg');
+    var width2 = 500;
+    var height2 = 500;
+    svg.attr("width", width2)
+        .attr("id", "svg1")
+        .attr("height", height2)
+        .style('position', 'absolute')
+        .style('top', '40')
+        .style('left', '0');
+    //Obtain 'year' and 'element' from the selection list
+    var obj = document.getElementById('year_set');
+    var objProduct = document.getElementById('product_set');
+    //clear all the things
+    d3.selectAll("g").remove();
+    //read the map data to draw map
+    d3.json("world-countries.json", function(data) {
+        var group = svg.selectAll("g").data(data.features).enter().append("g")
+        var projection = d3.geo.mercator();
+        var oldScala = projection.scale();
+        var oldTranslate = projection.translate();
+        xy = projection.scale(oldScala * (width / oldTranslate[0] / 2) * 2.0).translate([width / 2 - 500, height / 2 + 300]); //CENTER
+        path = d3.geo.path().projection(xy);
+        svg.attr('width', width).attr('height', height);
+        //定义最小值和最大值对应的颜色
+        var a = d3.rgb(255, 255, 255); //浅蓝
+        var b = d3.rgb(255, 0, 0); //
+        //颜色插值函数
+        var computeColor = d3.interpolate(a, b);
+
+        //read the data to be the color information of the map
+        d3.csv("all_country_export/" + objProduct.value + "_" + obj.value + ".csv", function(data) {
+            var ex = data;
+            //initial the tooltiop of the map
+            var tooltip = d3.select("body")
+                .append("div")
+                .attr("class", "tooltip") //用于css设置类样式
+                .attr("opacity", 0.0);
+
+            //initial the tooltiop of the pie chart
+            var tooltip2 = d3.select("body").append("div").attr("class", "tooltip2").attr("opacity", 0.0);
+
+            //format the data from the csv
+            var values = [];
+            var valueArray = [];
+            var norms = [];
+            var normArray = [];
+            for (var i = 0; i < ex.length; i++) {
+                if (ex[i].country !== "WLD") {
+                    var country = ex[i].country;
+                    var value = ex[i].value;
+                    values[country] = value;
+                    valueArray.push(value * 1000 / 1000);
+                }
             }
 
-            body {
-                display: block;
-                margin: 0px;
-                overflow: hidden;
-                padding: 0px;
+            var maxvalue = d3.max(valueArray);
+            var minvalue = d3.min(valueArray);
+            //console.log(maxvalue);
+            //console.log(minvalue);
+            //定义一个线性比例尺，将最小值和最大值之间的值映射到[0, 1]
+            for (var j = 0; j < ex.length; j++) {
+                if (ex[j].country !== "WLD") {
+                    var ncountry = ex[j].country;
+                    var nvalue = ex[j].value;
+                    norms[ncountry] = (nvalue * 1000 - minvalue * 1000) / (maxvalue * 1000);
+                    normArray.push((nvalue * 1000 - minvalue * 1000) / (maxvalue * 1000));
+                }
             }
-        </style>
-        <style type="text/css">
-            .tooltip2 {
-                font-size: 13px;
-                height: auto;
-                width=auto; position: absolute;
-                text-align: center;
-            }
-        </style>
-        <style type="text/css">
-            .tooltip3 {
-                font-family: simsun;
-                font-size: 16px;
-                width: 140px;
-                height: 100px;
-                position: absolute;
-                text-align: center;
-                border-style: solid;
-                border-width: 3px;
-                background-color: blue;
-                border-radius: 5px;
-            }
+            //console.log(norms);
+            console.log(normArray);
+            var min = d3.min(normArray);
+            var max = d3.max(normArray);
+            var linear = d3.scale.linear()
+                .domain([min, max])
+                .range([0, 1]);
+            //console.log(exportData.length);
+            var areas = group.append("path")
+                .attr("id", "mapShape")
+                .attr("d", path)
+                .attr("class", "area")
+                .attr("fill", function(d) {
+                    var t = linear(norms[d.id]);
+                    var color = computeColor(t);
+                    if (color == "#NaNNaNNaN") {
+                        return "#efefef";
+                    }
+                    return color.toString();
+                }) //function(d){return color( )})
+                .on('mouseout', function(datda) {
+                    d3.select(this).attr('fill', function(d) {
+                        tooltip.style("opacity", 0.0);
+                        var t = linear(norms[d.id]);
+                        var color = computeColor(t);
+                        //console.log(color);
+                        if (color == "#NaNNaNNaN") {
+                            return "#efefef";
+                        }
+                        return color.toString();
+                    });
+                })
+                .on('mouseover', function(data) {
+                    //设置tooltip文字
+                    tooltip.html(data.id + ":" + values[data.id])
+                    //设置tooltip的位置(left,top 相对于页面的距离)
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY + 20) + "px")
+                        .style("opacity", 1.0);
+                    d3.select(this)
+                        .attr('fill', 'rgba(2,2,139,0.61)');
 
-            body {
-                display: block;
-                margin: 0px;
-                overflow: hidden;
-                padding: 0px;
-            }
-        </style>
-        <script charset="utf-8" src="http://d3js.org/d3.v3.min.js"></script>
-        <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
-        <script src="export.js" type="text/javascript"></script>
-        <script src="math.js" type="text/javascript"></script>
-        <script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script>
-        <script src="http://underscorejs.org/underscore-min.js" type="text/javascript"></script>
-        <title></title>
-    </head>
-    <body>
-        <div id="container">
-            <form action="" id="frm" method="get" name="year_Form">
-                <select id="year_set" onchange="showSelectValue()">
-                    <option selected="selected" value="2007">2007
-				</option>
-                    <option value="2008">2008
-				</option>
-                    <option value="2009">2009
-				</option>
-                    <option value="2010">2010
-				</option>
-                    <option value="2011">2011
-				</option>
-                    <option value="2012">2012
-				</option>
-                    <option value="2013">2013
-				</option>
-                    <option value="2014">2014
-				</option>
-                    <option value="2015">2015
-				</option>
-                    <option value="2016">2016
-				</option>
-                </select>
-            </form>
-            <form action="" id="frm_product" method="get" name="year_Form">
-                <select id="product_set" onchange="showSelectValue()">
-                    <option selected="selected" value="Total">Total
-				</option>
-                    <option value="01-05_Animal">Animal
-				</option>
-                    <option value="06-15_Vegetable">Vegetable
-				</option>
-                    <option value="16-24_FoodProd">FoodProd
-				</option>
-                    <option value="25-26_Minerals">Minerals
-				</option>
-                    <option value="27-27_Fuels">Fuels
-				</option>
-                    <option value="28-38_Chemicals">Chemicals
-				</option>
-                    <option value="39-40_PlastiRub">PlastiRub
-				</option>
-                    <option value="41-43_HidesSkin">HidesSkin
-				</option>
-                    <option value="44-49_Wood">Wood
-				</option>
-                    <option value="50-63_TextCloth">TextCloth
-				</option>
-                </select>
-            </form>
-        </div>
-        <svg>
-            <radialgradient id="tip">
-                <stop offset="0" stop-color="white"></stop>
-                <stop offset="0.2" stop-color="pink"></stop>
-                <stop offset="1" stop-color="white"></stop>
-            </radialgradient>
-        </svg>
-        <script type="text/javascript">
-            
-	
-var marginTop = 350;
-var marginBottom = 30;
-var marginRight = 50;
-var marginLeft = 180;
-var height_stream = 580 - marginTop - marginBottom;
-var width_stream = 680 - marginLeft - marginRight;
-var height = window.innerHeight * 1.8;
-var width = window.innerWidth;
-//creating svg to draw map
-//with id 'svg1'
-var svg = d3.select('#container')
-			.append('svg');
-var width2 = 500;
-var height2 = 500;
-svg.attr("width", width2)
-	.attr("id", "svg1")
-	.attr("height", height2)
-	.style('position', 'absolute')
-	.style('top', '40')
-	.style('left', '0');
-//Obtain 'year' and 'element' from the selection list
-var obj = document.getElementById('year_set');
-var objProduct = document.getElementById('product_set');
-//clear all the things
-d3.selectAll("g").remove();
-//read the map data to draw map
-d3.json("world-countries.json", function(data) {
-	var group = svg.selectAll("g").data(data.features).enter().append("g")
-	var projection = d3.geo.mercator();
-	var oldScala = projection.scale();
-	var oldTranslate = projection.translate();
-	xy = projection.scale(oldScala * (width / oldTranslate[0] / 2) * 2.0).translate([width / 2 - 500, height / 2 + 300]); //CENTER
-	path = d3.geo.path().projection(xy);
-	svg.attr('width', width).attr('height', height);
-	//定义最小值和最大值对应的颜色
-	var a = d3.rgb(255, 255, 255); //浅蓝
-	var b = d3.rgb(255, 0, 0); //
-	//颜色插值函数
-	var computeColor = d3.interpolate(a, b);
-	
-	//read the data to be the color information of the map
-	d3.csv("all_country_export/" + objProduct.value + "_" + obj.value + ".csv", function(data) {
-		var ex = data;
-		//initial the tooltiop of the map
-		var tooltip = d3.select("body")
-			.append("div")
-			.attr("class", "tooltip") //用于css设置类样式
-			.attr("opacity", 0.0);
-		
-		//initial the tooltiop of the pie chart
-		var tooltip2 = d3.select("body").append("div").attr("class", "tooltip2").attr("opacity", 0.0);
-		
-		//format the data from the csv
-		var values = [];
-		var valueArray = [];
-		var norms = [];
-		var normArray = [];
-		for (var i = 0; i < ex.length; i++) {
-			if (ex[i].country !== "WLD") {
-				var country = ex[i].country;
-				var value = ex[i].value;
-				values[country] = value;
-				valueArray.push(value * 1000 / 1000);
-			}
-		}
-		
-		var maxvalue = d3.max(valueArray);
-		var minvalue = d3.min(valueArray);
 
-		//console.log(maxvalue);
-		//console.log(minvalue);
-		//定义一个线性比例尺，将最小值和最大值之间的值映射到[0, 1]
-		for (var j = 0; j < ex.length; j++) {
-			if (ex[j].country !== "WLD") {
-				var ncountry = ex[j].country;
-				var nvalue = ex[j].value;
-				norms[ncountry] = (nvalue * 1000 - minvalue * 1000) / (maxvalue * 1000);
-				normArray.push((nvalue * 1000 - minvalue * 1000) / (maxvalue * 1000));
-			}
-		}
-		//console.log(norms);
-		console.log(normArray);
-		var min = d3.min(normArray);
-		var max = d3.max(normArray);
-		var linear = d3.scale.linear()
-						.domain([min, max])
-						.range([0, 1]);
-		//console.log(exportData.length);
-		var areas = group.append("path")
-					.attr("id", "mapShape")
-					.attr("d", path)
-					.attr("class", "area")
-					.attr("fill", function(d) {
-						var t = linear(norms[d.id]);
-						var color = computeColor(t);
-						if (color == "#NaNNaNNaN") {
-							return "#505050";
-						}
-						return color.toString();
-					}) //function(d){return color( )})
-					.on('mouseout', function(datda) {
-						d3.select(this).attr('fill', function(d) {
-						tooltip.style("opacity", 0.0);
-						var t = linear(norms[d.id]);
-						var color = computeColor(t);
-						//console.log(color);
-							if (color == "#NaNNaNNaN") {
-								return "#505050";
-							}
-						return color.toString();
-						});
-					})
-					.on('mouseover', function(data) {
-					//设置tooltip文字
-					tooltip.html(data.id + ":" + values[data.id])
-					//设置tooltip的位置(left,top 相对于页面的距离)
-					.style("left", (d3.event.pageX) + "px")
-					.style("top", (d3.event.pageY + 20) + "px")
-					.style("opacity", 1.0);
-					d3.select(this)
-					.attr('fill', 'rgba(2,2,139,0.61)');
-					})
-					//点击事件：
-					.on('mousedown', function(data) {
-					//若点击的国家无数据，则不显示
-						if (values[data.id] != undefined) {
-						//得到年份
-							var year = document.getElementById('year_set');
-							console.log(year.value);
-							d3.csv("all_product_export/" + data.id + "_all_product_ex.csv", function(productdata) {
-								//clear pie chart and stacked area chart
-								d3.select('#container').select("#svg2").remove();
-								d3.select('#container').select("#stream").remove();
-								//Creating svg2 to draw pie chart
-								var svg2 = d3.select('#container')
-											.append('svg');
-								var width2 = 620;
-								var height2 = 500;
-								svg2.attr("width", width2)
-									.attr("height", height2)
-									.attr("id", "svg2")
-									.style('position', 'absolute')
-									.style('left', '600');
-								//creating svg3 to draw stacked area chart	
-								var svgSelection = d3.select('#container')
-													 .append("svg");
-								svgSelection.attr("id", "stream")
-											.attr("width", width_stream + marginLeft + marginRight)
-											.attr("height", height_stream + marginTop + marginBottom)
-											.style('position', 'absolute')
-											.style('top', 600)
-											.style('left', 600);
-											
-								for (var i = 0; i < ex.length; i++) {
-									if (year.value == productdata[i].year) {
-											var showdata = [];
-											showdata.push(productdata[i]['01-05_Animal']);
-											showdata.push(productdata[i]['06-15_Vegetable']);
-											showdata.push(productdata[i]['16-24_FoodProd']);
-											showdata.push(productdata[i]['25-26_Minerals']);
-											showdata.push(productdata[i]['27-27_Fuels']);
-											showdata.push(productdata[i]['28-38_Chemicals']);
-											showdata.push(productdata[i]['39-40_PlastiRub']);
-											showdata.push(productdata[i]['41-43_HidesSkin']);
-											showdata.push(productdata[i]['44-49_Wood']);
-											showdata.push(productdata[i]['50-63_TextCloth']);
-											var showsum = d3.sum(showdata);
-											console.log(showsum);
-											var showdataname = ['Animal', 'Vegetable', 'FoodProd', 'Minerals', 'Fuels', 'Chemicals', 'PlastiRub', 'HidesSkin', 'Wood', 'TextCloth'];
-											break;
-									}
-								}
-								//------------
-								//堆叠面积图的大小
-								var parseDate = d3.time.format("%Y").parse;
-								productdata.forEach(function(d) {
-									d.year = parseDate(d.year);
-								});
-								var newDataset = ["01-05_Animal", "06-15_Vegetable", "16-24_FoodProd", "25-26_Minerals", "27-27_Fuels", "28-38_Chemicals", "39-40_PlastiRub", "41-43_HidesSkin", "44-49_Wood", "50-63_TextCloth"].map(function(n) {
-									return productdata.map(function(d, i) {
-										return {
-											x: d.year,
-											y: Number(d[n]),
-											y0: 0
-										};
-									});
-								});
+                })
+                //点击事件：
+                .on('mousedown', function(data) {
+                    //若点击的国家无数据，则不显示
+                    if (values[data.id] != undefined) {
+                        //得到年份
+                        var year = document.getElementById('year_set');
+                        console.log(year.value);
+                        d3.csv("all_product_export/" + data.id + "_all_product_ex.csv", function(productdata) {
+                            //clear pie chart and stacked area chart
+                            d3.select('#container').select("#svg2").remove();
+                            d3.select('#container').select("#stream").remove();
+                            //Creating svg2 to draw pie chart
+                            var svg2 = d3.select('#container')
+                                .append('svg');
+                            var width2 = 620;
+                            var height2 = 400;
+                            svg2.attr("width", width2)
+                                .attr("height", height2)
+                                .attr("id", "svg2")
+                                .style('position', 'absolute')
+                                .style('left', '600');
+                            //creating svg3 to draw stacked area chart
+                            var svgSelection = d3.select('#container')
+                                .append("svg");
+                            svgSelection.attr("id", "stream")
+                                .attr("width", width_stream + marginLeft + marginRight)
+                                .attr("height", height_stream + marginTop + marginBottom)
+                                .style('position', 'absolute')
+                                .style('top', 400)
+                                .style('left', 600);
 
-								console.log(newDataset);
-								var baseGroup = svgSelection.append("g")
-															.attr("transform", "translate(" + marginLeft + "," + marginTop + ")");
+                            for (var i = 0; i < ex.length; i++) {
+                                if (year.value == productdata[i].year) {
+                                    var showdata = [];
+                                    showdata.push(productdata[i]['01-05_Animal']);
+                                    showdata.push(productdata[i]['06-15_Vegetable']);
+                                    showdata.push(productdata[i]['16-24_FoodProd']);
+                                    showdata.push(productdata[i]['25-26_Minerals']);
+                                    showdata.push(productdata[i]['27-27_Fuels']);
+                                    showdata.push(productdata[i]['28-38_Chemicals']);
+                                    showdata.push(productdata[i]['39-40_PlastiRub']);
+                                    showdata.push(productdata[i]['41-43_HidesSkin']);
+                                    showdata.push(productdata[i]['44-49_Wood']);
+                                    showdata.push(productdata[i]['50-63_TextCloth']);
+                                    var showsum = d3.sum(showdata);
+                                    console.log(showsum);
+                                    var showdataname = ['Animal', 'Vegetable', 'FoodProd', 'Minerals', 'Fuels', 'Chemicals', 'PlastiRub', 'HidesSkin', 'Wood', 'TextCloth'];
+                                    break;
+                                }
+                            }
+                            //------------
+                            //堆叠面积图的大小
+                            var parseDate = d3.time.format("%Y").parse;
+                            productdata.forEach(function(d) {
+                                d.year = parseDate(d.year);
+                            });
+                            var newDataset = ["01-05_Animal", "06-15_Vegetable", "16-24_FoodProd", "25-26_Minerals", "27-27_Fuels", "28-38_Chemicals", "39-40_PlastiRub", "41-43_HidesSkin", "44-49_Wood", "50-63_TextCloth"].map(function(n) {
+                                return productdata.map(function(d, i) {
+                                    return {
+                                        x: d.year,
+                                        y: Number(d[n]),
+                                        y0: 0
+                                    };
+                                });
+                            });
+                            console.log(newDataset);
+                            var baseGroup = svgSelection.append("g")
+                                .attr("transform", "translate(" + marginLeft + "," + marginTop + ")");
+                            var max_data = [];
 
-								var max_data = [];
-									
-								//format the data
-								for (var k = 0; k < newDataset[1].length; k++) {
-									var d = 0;
-									for (var i = 0; i < 10; i++) {
-										d = d + newDataset[i][k].y;
-									}
-								max_data.push(d)
-								}
-								console.log("max_data:" + max_data)
-								var maxHeight = d3.max(max_data);
-								console.log("max:" + maxHeight)
-								var minHeight = d3.min(newDataset, function(d) {
-									return d3.min(d, function(d) {
-									return (d.y0);
-									}); //d.y +
-								});
-								//20 colors
-								var color = d3.scale.category20();
-								var xScale = d3.time.scale().range([0, width_stream]);
-								xScale.domain(d3.extent(productdata, function(d) {
-									return d.year
-								}))
-								var colorScale = d3.scale.ordinal().range(["#F37B6D", "#6CC071"]); //"#F37B6D", "#6CC071",
-								var hoverLabel = d3.scale.ordinal().range(["01-05_Animal", "06-15_Vegetable", "16-24_FoodProd", "25-26_Minerals", "27-27_Fuels", "28-38_Chemicals", "39-40_PlastiRub", "41-43_HidesSkin", "44-49_Wood", "50-63_TextCloth"]);
-								var yScale = d3.scale.linear().domain([maxHeight, 0]).range([0, height_stream]);
-								var yAxis = d3.svg.axis().scale(yScale)
-										.ticks(8, ",f")
-										.orient("left");
-								var xBar = d3.svg.axis().scale(xScale).orient("bottom");
-								d3.layout.stack()(newDataset);
+                            //format the data
+                            for (var k = 0; k < newDataset[1].length; k++) {
+                                var d = 0;
+                                for (var i = 0; i < 10; i++) {
+                                    d = d + newDataset[i][k].y;
+                                }
+                                max_data.push(d)
+                            }
+                            console.log("max_data:" + max_data)
+                            var maxHeight = d3.max(max_data);
+                            console.log("max:" + maxHeight)
+                            var minHeight = d3.min(newDataset, function(d) {
+                                return d3.min(d, function(d) {
+                                    return (d.y0);
+                                }); //d.y +
+                            });
+                            //20 colors
+                            var color = d3.scale.category20();
+                            var xScale = d3.time.scale().range([0, width_stream]);
+                            xScale.domain(d3.extent(productdata, function(d) {
+                                return d.year
+                            }))
+                            var colorScale = d3.scale.ordinal().range(["#F37B6D", "#6CC071"]); //"#F37B6D", "#6CC071",
+                            var hoverLabel = d3.scale.ordinal().range(["01-05_Animal", "06-15_Vegetable", "16-24_FoodProd", "25-26_Minerals", "27-27_Fuels", "28-38_Chemicals", "39-40_PlastiRub", "41-43_HidesSkin", "44-49_Wood", "50-63_TextCloth"]);
 
-								baseGroup.append("g").attr("class", "xaxis").attr("transform", "translate(0," + height_stream + ")") //height_stream
-								.call(xBar);
-								baseGroup.append("g").attr("class", "yaxis").call(yAxis);
-								var area = d3.svg.area().x(function(d) {
-									return xScale(d.x);
-								}).y0(function(d) {
-									return yScale(d.y0);
-								}).y1(function(d) {
-									return yScale((d.y + d.y0));
-								}); 
-								var ageGroup = baseGroup.selectAll(".valgroup").data(newDataset).enter().append("g").attr("class", "valgroup").style("fill", function(d, i) {
-								//console.log("the color sequence number:"+ ((i+1)*2-1));
-								return color(i);
-								}) //colorScale(i); })
-								.attr("class", function(d, i) {
-									return hoverLabel(i);
-								});
-								ageGroup.append("path").attr("d", function(d) {
-								return area(d);
-								});
-								//draw pie chart
-						var pie = d3.layout.pie();
-						var piedata = pie(showdata);
-						piedata[0].data = "Animal";
-						piedata[1].data = "Vegetable";
-						piedata[2].data = "FoodProd";
-						piedata[3].data = "Minerals";
-						piedata[4].data = "Fuels"
-						piedata[5].data = "Chemicals";
-						piedata[6].data = "PlastiRub";
-						piedata[7].data = "HidesSkin";
-						piedata[8].data = "Wood";
-						piedata[9].data = "TextCloth";
-						console.log(piedata);
-						var outerRadius = 180; //外半径
-						var innerRadius = 0; //内半径，为0则中间没有空白
-						var arc = d3.svg.arc() //弧生成器
-							.innerRadius(innerRadius) //设置内半径
-							.outerRadius(outerRadius); //设置外半径
-						// var color = d3.scale.category20();   //有二十种颜色的颜色比例尺
-						//===
-						svg2.append("text").attr("x", "183").attr("y", "30").style("font-size", "20px").text(data.id);
-						//===
-						var shape = svg2.append("rect").attr("x", "450").attr("y", "100").attr("rx", "10").attr("ry", "10").attr("width", "150").attr("height", "300").attr('stroke', 'red').attr('stroke-width', '5px').attr("fill", "white");
-						var hint = svg2.selectAll("rect").data(piedata);
-						hint.enter().append("rect").attr("x", "470").attr("y", function(d, i) {
-							return 90 + 30 * i;
-						}).attr("width", "50").attr("height", "25").attr("fill", function(d, i) {
-							return color(i);
-						});
-						var hinttext = svg2.selectAll("text").data(piedata);
-						hinttext.enter().append("text").attr("x", "530").attr("y", function(d, i) {
-							return 105 + 30 * i;
-						}).style("font-size", "12px").text(function(d, i) {
-							return d.data;
-						});
-						var arcs = svg2.selectAll("g").data(piedata).enter().append("g").attr("transform", "translate(" + 205 + "," + 260 + ")");
-						//.attr("transform","translate("+ (width2/2) +","+ (width2/2) +")");
-						//console.log("yes");
-						arcs.append("path").attr("fill", function(d, i) {
-								var num = 2 * i + 1;
-								console.log(num);
-								return color(i);
-							}).attr("d", function(d) {
-								return arc(d); //调用弧生成器，得到路径值
-							})
-							//====
-							.on('mouseover', function(data, d) {
-								tooltip2.html(data.data + ":" + ((data.value * 1000) / (showsum * 1000) * 100).toFixed(2) + "%").style("left", (d3.event.pageX) + "px").style("top", (d3.event.pageY + 20) + "px").style("opacity", 1.0);
-								//d3.select(this)
-								//.attr('stroke','#00ffff');
-								d3.select(this).attr('stroke', '#00ffff').attr('stroke-width', '3px');
-							}).on('mouseout', function(data) {
-								tooltip2.style("opacity", 0.0);
-								d3.select(this).transition().duration(200).attr('stroke', 'none');
-								//.attr("fill",function(d,i){
-								//    return color(i);
-								//})
-							});
-						//====
-						/** arcs.append("text")
-						     .attr("transform",function(d){
+                            var yScale = d3.scale.linear().domain([1, 0]).range([0, height_stream]);//maxHeight
+                            var yAxis = d3.svg.axis().scale(yScale)
+                                .ticks(8, ",f")
+                                .tickFormat(d3.format("%"))
+                                .orient("left");
+
+                            var xBar = d3.svg.axis().scale(xScale).orient("bottom");
+
+                            d3.layout.stack()(newDataset);
+                            baseGroup.append("g").attr("class", "xaxis").attr("transform", "translate(0," + height_stream + ")") //height_stream
+                                .call(xBar);
+                            baseGroup.append("g").attr("class", "yaxis").call(yAxis);
+
+                            var area = d3.svg.area().x(function(d) {
+                                return xScale(d.x);
+                            }).y0(function(d) {
+                                return yScale(d.y0/maxHeight);
+                            }).y1(function(d) {
+                                return yScale((d.y + d.y0)/maxHeight);
+                            });
+                            var ageGroup = baseGroup.selectAll(".valgroup")
+                                .data(newDataset)
+                                .enter()
+                                .append("g")
+                                .attr("class", "valgroup")
+                                .style("fill", function(d, i) {
+                                //console.log("the color sequence number:"+ ((i+1)*2-1));
+                                return color(i);
+                            }) //colorScale(i); })
+                                .attr("class", function(d, i) {
+                                    return hoverLabel(i);
+                                });
+                            ageGroup.append("path").attr("d", function(d) {
+                                return area(d);
+                            });
+                            //draw pie chart
+                            var pie = d3.layout.pie();
+                            var piedata = pie(showdata);
+                            piedata[0].data = "Animal";
+                            piedata[1].data = "Vegetable";
+                            piedata[2].data = "FoodProd";
+                            piedata[3].data = "Minerals";
+                            piedata[4].data = "Fuels"
+                            piedata[5].data = "Chemicals";
+                            piedata[6].data = "PlastiRub";
+                            piedata[7].data = "HidesSkin";
+                            piedata[8].data = "Wood";
+                            piedata[9].data = "TextCloth";
+                            console.log(piedata);
+                            var outerRadius = 140; //外半径
+                            var innerRadius = 0; //内半径，为0则中间没有空白
+                            var arc = d3.svg.arc() //弧生成器
+                                .innerRadius(innerRadius) //设置内半径
+                                .outerRadius(outerRadius); //设置外半径
+                            // var color = d3.scale.category20();   //有二十种颜色的颜色比例尺
+                            //===
+                            svg2.append("text").attr("x", "183").attr("y", "30").style("font-size", "20px").text(data.id);
+                            //===
+                            var shape = svg2.append("rect").attr("x", "450").attr("y", "65").attr("rx", "10").attr("ry", "10").attr("width", "150").attr("height", "300").attr('stroke', 'red').attr('stroke-width', '5px').attr("fill", "white");
+                            var hint = svg2.selectAll("rect").data(piedata);
+                            hint.enter().append("rect").attr("x", "470").attr("y", function(d, i) {
+                                return 50 + 30 * i;
+                            }).attr("width", "50").attr("height", "25").attr("fill", function(d, i) {
+                                return color(i);
+                            });
+                            var hinttext = svg2.selectAll("text").data(piedata);
+                            hinttext.enter().append("text").attr("x", "530").attr("y", function(d, i) {
+                                return 65 + 30 * i;
+                            }).style("font-size", "12px").text(function(d, i) {
+                                return d.data;
+                            });
+                            var arcs = svg2.selectAll("g").data(piedata).enter().append("g").attr("transform", "translate(" + 205 + "," + 210 + ")");
+                            //.attr("transform","translate("+ (width2/2) +","+ (width2/2) +")");
+                            //console.log("yes");
+                            arcs.append("path").attr("fill", function(d, i) {
+                                var num = 2 * i + 1;
+                                console.log(num);
+                                return color(i);
+                            }).attr("d", function(d) {
+                                return arc(d); //调用弧生成器，得到路径值
+                            })
+                            //====
+                                .on('mouseover', function(data, d) {
+                                    tooltip2.html(data.data + ":" + ((data.value * 1000) / (showsum * 1000) * 100).toFixed(2) + "%")
+                                        .style("left", (d3.event.pageX) + "px")
+                                        .style("top", (d3.event.pageY + 20) + "px")
+                                        .style("opacity", 1.0);
+                                    //d3.select(this)
+                                    //.attr('stroke','#00ffff');
+                                    d3.select(this).attr('stroke', '#00ffff').attr('stroke-width', '3px');
+                                }).on('mouseout', function(data) {
+                                tooltip2.style("opacity", 0.0);
+                                d3.select(this).transition().duration(200).attr('stroke', 'none');
+                                //.attr("fill",function(d,i){
+                                //    return color(i);
+                                //})
+                            });
+                            //====
+                            /** arcs.append("text")
+                             .attr("transform",function(d){
 						         return "translate(" + arc.centroid(d) + ")";
 						     })
-						     .attr("text-anchor","middle")
-						     .style("font-size","12px")
-						     .text(function(d){
+                             .attr("text-anchor","middle")
+                             .style("font-size","12px")
+                             .text(function(d){
 						         if(d.endAngle-d.startAngle>=0.3)
 						         {console.log(d);
 						         return d.data;}
 						     });*/
-					})
-				}
-			}).attr('stroke', '#0A0A0A');
-		//定义一个线性渐变
-		var defs = svg.append("defs");
-		var linearGradient = defs.append("linearGradient").attr("id", "linearColor").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
-		var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
-		var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
-		//添加一个矩形，并应用线性渐变
-		var colorRect = svg.append("rect").attr("x", 30).attr("y", 80).attr("width", 140).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
-		//添加文字
-		d3.selectAll("text").remove();
-		var minValueText = svg.append("text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
-			return minvalue;
-		});
-		var maxValueText = svg.append("text").attr("class", "valueText").attr("x", 140).attr("y", 120).attr("dy", "-0.3em").text(function() {
-			return maxvalue;
-		});
-	})
-})
-//================
-function showProductSelectValue() {
-	var obj = document.getElementById('product_set');
-	console.log(obj.value);
-}
-//选择后调用的函数
-function showSelectValue() {
-	var obj = document.getElementById('year_set');
-	var objProduct = document.getElementById('product_set');
-	d3.select('#container').select("#svg2").remove();
-	d3.select('#container').select("#stream").remove();
-	//d3.selectAll("g")
-	//    .remove();
-	//console.log(objProduct.value);
-	d3.json("world-countries.json", function(data) {
-		/* Antarctica will not shown on the map */
-		// var features = _.filter(data.features, function(value, key) {
-		//     return value;
-		// });
-		var group = svg.selectAll("g").data(data.features);
-		//.enter()
-		var projection = d3.geo.mercator();
-		var oldScala = projection.scale();
-		var oldTranslate = projection.translate();
-		xy = projection.scale(oldScala * (width / oldTranslate[0] / 2) * 2.0).translate([width / 2 - 500, height / 2 + 300]); //CENTER
-		path = d3.geo.path().projection(xy);
-		svg.attr('width', width).attr('height', height);
-		//定义最小值和最大值对应的颜色
-		var a = d3.rgb(255, 255, 255); //浅蓝
-		//var a = d3.rgb(0,255,255);
-		var b = d3.rgb(255, 0, 0); //
-		//颜色插值函数
-		var computeColor = d3.interpolate(a, b);
-		//直接读入js文件
-		// var ex_data = exportData.export;
-		// console.log(ex_data);
-		//从csv文件中读取数据！！！
-		//var textobj=document.getElementsByName('text');
-		//var selectvalue = obj.value;
-		//console.log(selectvalue);
-		d3.csv("all_country_export/" + objProduct.value + "_" + obj.value + ".csv", function(data) {
-			var ex = data;
-			//console.log(ex);
-			var tooltip = d3.select("body").append("div").attr("class", "tooltip") //用于css设置类样式
-				.attr("opacity", 0.0);
-			//====
-			var tooltip2 = d3.select("body").append("div").attr("class", "tooltip2").attr("opacity", 0.0);
-			//====
-			var values = [];
-			var valueArray = [];
-			var norms = [];
-			var normArray = [];
-			for (var i = 0; i < ex.length; i++) {
-				if (ex[i].country !== "WLD") {
-					var country = ex[i].country;
-					var value = ex[i].value;
-					values[country] = value;
-					valueArray.push(value * 1000 / 1000);
-				}
-			}
-			//console.log(valueArray);
-			var maxvalue = d3.max(valueArray);
-			var minvalue = d3.min(valueArray);
-			console.log(maxvalue);
-			console.log(minvalue);
-			//定义一个线性比例尺，将最小值和最大值之间的值映射到[0, 1]
-			for (var j = 0; j < ex.length; j++) {
-				if (ex[j].country !== "WLD") {
-					var ncountry = ex[j].country;
-					var nvalue = ex[j].value;
-					norms[ncountry] = (nvalue * 1000 - minvalue * 1000) / (maxvalue * 1000);
-					normArray.push((nvalue * 1000 - minvalue * 1000) / (maxvalue * 1000));1
-				}
-			}
-			//console.log(norms);
-			console.log(normArray);
-			var min = d3.min(normArray);
-			var max = d3.max(normArray);
-			var linear = d3.scale.linear().domain([min, max]).range([0, 1]);
-			//console.log(exportData.length);
-			var areas = group.selectAll("path")
-				//.attr("d", path)
-				//.attr("class", "area")
-				.transition().duration(200).attr("fill", function(d) {
-					var t = linear(norms[d.id]);
-					var color = computeColor(t);
-					//console.log(color);
-					if (color == "#NaNNaNNaN") {
-						return "#efefef";
-					}
-					return color.toString();
-				}); //function(d){return color( )})
-			//点击事件：
-			//定义一个线性渐变
-			var defs = svg.append("defs");
-			var linearGradient = defs.append("linearGradient").attr("id", "linearColor").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
-			var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
-			var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
-			//添加一个矩形，并应用线性渐变
-			var colorRect = svg.append("rect").attr("x", 30).attr("y", 80).attr("width", 140).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
-			//添加文字
-			d3.selectAll("text").remove();
-			var minValueText = svg.append("text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
-				return minvalue;
-			});
-			var maxValueText = svg.append("text").attr("class", "valueText").attr("x", 140).attr("y", 120).attr("dy", "-0.3em").text(function() {
-				return maxvalue;
-			});
-			/*group.append("titile")
-			    .attr("x", function (d) {
-			        return path.centroid(d)[0];
-			    })
-			    .attr("y", function (d) {
-			        return path.centroid(d)[1];
-			    })
-			    .attr("text-anchor", "middle")
-			    .text(function (d) {
-			        return d.id;
-			    })*/
-		});
-	});
-	//alert(obj.value);
-}
-	
-        </script>
-    </body>
+                        })
+                    }
+                }).attr('stroke', '#0A0A0A');
+            //定义一个线性渐变
+            var defs = svg.append("defs");
+            var linearGradient = defs.append("linearGradient").attr("id", "linearColor").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
+            var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
+            var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
+            //添加一个矩形，并应用线性渐变
+            var colorRect = svg.append("rect").attr("x", 30).attr("y", 80).attr("width", 140).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
+            //添加文字
+            d3.selectAll("text").remove();
+            var minValueText = svg.append("text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
+                return minvalue;
+            });
+            var maxValueText = svg.append("text").attr("class", "valueText").attr("x", 140).attr("y", 120).attr("dy", "-0.3em").text(function() {
+                return maxvalue;
+            });
+        })
+    })
+    //================
+    function showProductSelectValue() {
+        var obj = document.getElementById('product_set');
+        console.log(obj.value);
+    }
+    //选择后调用的函数
+    function showSelectValue() {
+        var obj = document.getElementById('year_set');
+        var objProduct = document.getElementById('product_set');
+        d3.select('#container').select("#svg2").remove();
+        d3.select('#container').select("#stream").remove();
+        //d3.selectAll("g")
+        //    .remove();
+        //console.log(objProduct.value);
+        d3.json("world-countries.json", function(data) {
+            /* Antarctica will not shown on the map */
+            // var features = _.filter(data.features, function(value, key) {
+            //     return value;
+            // });
+            var group = svg.selectAll("g").data(data.features);
+            //.enter()
+            var projection = d3.geo.mercator();
+            var oldScala = projection.scale();
+            var oldTranslate = projection.translate();
+            xy = projection.scale(oldScala * (width / oldTranslate[0] / 2) * 2.0).translate([width / 2 - 500, height / 2 + 300]); //CENTER
+            path = d3.geo.path().projection(xy);
+            svg.attr('width', width).attr('height', height);
+            //定义最小值和最大值对应的颜色
+            var a = d3.rgb(255, 255, 255); //浅蓝
+            //var a = d3.rgb(0,255,255);
+            var b = d3.rgb(255, 0, 0); //
+            //颜色插值函数
+            var computeColor = d3.interpolate(a, b);
+            //直接读入js文件
+            // var ex_data = exportData.export;
+            // console.log(ex_data);
+            //从csv文件中读取数据！！！
+            //var textobj=document.getElementsByName('text');
+            //var selectvalue = obj.value;
+            //console.log(selectvalue);
+            d3.csv("all_country_export/" + objProduct.value + "_" + obj.value + ".csv", function(data) {
+                var ex = data;
+                //console.log(ex);
+                var tooltip = d3.select("body").append("div").attr("class", "tooltip") //用于css设置类样式
+                    .attr("opacity", 0.0);
+                //====
+                var tooltip2 = d3.select("body").append("div").attr("class", "tooltip2").attr("opacity", 0.0);
+                //====
+                var values = [];
+                var valueArray = [];
+                var norms = [];
+                var normArray = [];
+                for (var i = 0; i < ex.length; i++) {
+                    if (ex[i].country !== "WLD") {
+                        var country = ex[i].country;
+                        var value = ex[i].value;
+                        values[country] = value;
+                        valueArray.push(value * 1000 / 1000);
+                    }
+                }
+                //console.log(valueArray);
+                var maxvalue = d3.max(valueArray);
+                var minvalue = d3.min(valueArray);
+                console.log(maxvalue);
+                console.log(minvalue);
+                //定义一个线性比例尺，将最小值和最大值之间的值映射到[0, 1]
+                for (var j = 0; j < ex.length; j++) {
+                    if (ex[j].country !== "WLD") {
+                        var ncountry = ex[j].country;
+                        var nvalue = ex[j].value;
+                        norms[ncountry] = (nvalue * 1000 - minvalue * 1000) / (maxvalue * 1000);
+                        normArray.push((nvalue * 1000 - minvalue * 1000) / (maxvalue * 1000));1
+                    }
+                }
+                //console.log(norms);
+                console.log(normArray);
+                var min = d3.min(normArray);
+                var max = d3.max(normArray);
+                var linear = d3.scale.linear().domain([min, max]).range([0, 1]);
+                //console.log(exportData.length);
+                var areas = group.selectAll("path")
+                //.attr("d", path)
+                //.attr("class", "area")
+                    .transition().duration(200).attr("fill", function(d) {
+                        var t = linear(norms[d.id]);
+                        var color = computeColor(t);
+                        //console.log(color);
+                        if (color == "#NaNNaNNaN") {
+                            return "#efefef";
+                        }
+                        return color.toString();
+                    }); //function(d){return color( )})
+                //点击事件：
+                //定义一个线性渐变
+                var defs = svg.append("defs");
+                var linearGradient = defs.append("linearGradient").attr("id", "linearColor").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
+                var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
+                var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
+                //添加一个矩形，并应用线性渐变
+                var colorRect = svg.append("rect").attr("x", 30).attr("y", 80).attr("width", 140).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
+                //添加文字
+                d3.selectAll("text").remove();
+                var minValueText = svg.append("text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
+                    return minvalue;
+                });
+                var maxValueText = svg.append("text").attr("class", "valueText").attr("x", 140).attr("y", 120).attr("dy", "-0.3em").text(function() {
+                    return maxvalue;
+                });
+                /*group.append("titile")
+                    .attr("x", function (d) {
+                        return path.centroid(d)[0];
+                    })
+                    .attr("y", function (d) {
+                        return path.centroid(d)[1];
+                    })
+                    .attr("text-anchor", "middle")
+                    .text(function (d) {
+                        return d.id;
+                    })*/
+            });
+        });
+        //alert(obj.value);
+    }
+
+</script>
+</body>
 </html>
