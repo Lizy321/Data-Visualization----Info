@@ -29,26 +29,6 @@
       text-align: center;
     }
   </style>
-  <style type="text/css">
-    .tooltip3 {
-      font-family: simsun;
-      font-size: 16px;
-      width: 140px;
-      height: 100px;
-      position: absolute;
-      text-align: center;
-      border-style: solid;
-      border-width: 3px;
-      background-color: blue;
-      border-radius: 5px;
-    }
-    body {
-      display: block;
-      margin: 0px;
-      overflow: hidden;
-      padding: 0px;
-    }
-  </style>
   <script charset="utf-8" src="http://d3js.org/d3.v3.min.js"></script>
   <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
   <script src="export.js" type="text/javascript"></script>
@@ -59,7 +39,6 @@
 </head>
 <body>
 <div id="container">
-  <form action="" id="frm" method="get" name="year_Form">
     <select id="year_set" onchange="showSelectValue()">
       <option selected="selected" value="2007">2007
       </option>
@@ -82,8 +61,8 @@
       <option value="2016">2016
       </option>
     </select>
-  </form>
-  <form action="" id="frm_product" method="get" name="year_Form">
+
+
     <select id="product_set" onchange="showSelectValue()">
       <option selected="selected" value="Total">Total
       </option>
@@ -108,7 +87,7 @@
       <option value="50-63_TextCloth">TextCloth
       </option>
     </select>
-  </form>
+
 </div>
 <svg>
   <radialgradient id="tip">
@@ -126,8 +105,10 @@
     var marginLeft = 50;
     var height_stream = 380 - marginTop - marginBottom;
     var width_stream = 600 - marginLeft - marginRight;
-    var height = window.innerHeight * 1.8;
-    var width = window.innerWidth;
+    var height = 1250;
+	var width = 1400;
+	//var height = window.innerHeight * 1.8;
+    //var width = window.innerWidth;
     //creating svg to draw map
     //with id 'svg1'
     var svg = d3.select('#container')
@@ -165,9 +146,9 @@
             var ex = data;
             //initial the tooltiop of the map
             var tooltip = d3.select("body")
-                .append("div")
+				.append("div")
                 .attr("class", "tooltip") //用于css设置类样式
-                .attr("opacity", 0.0);
+                .style("opacity", 0.0);
 
             //initial the tooltiop of the pie chart
             var tooltip2 = d3.select("body").append("div").attr("class", "tooltip2").attr("opacity", 0.0);
@@ -271,8 +252,8 @@
                                 .attr("width", width_stream + marginLeft + marginRight)
                                 .attr("height", height_stream + marginTop + marginBottom)
                                 .style('position', 'absolute')
-                                .style('top', 400)
-                                .style('left', 600);
+                                .style('top', 360)
+                                .style('left', 650);
 
                             for (var i = 0; i < ex.length; i++) {
                                 if (year.value == productdata[i].year) {
@@ -435,18 +416,6 @@
                                 //    return color(i);
                                 //})
                             });
-                            //====
-                            /** arcs.append("text")
-                             .attr("transform",function(d){
-						         return "translate(" + arc.centroid(d) + ")";
-						     })
-                             .attr("text-anchor","middle")
-                             .style("font-size","12px")
-                             .text(function(d){
-						         if(d.endAngle-d.startAngle>=0.3)
-						         {console.log(d);
-						         return d.data;}
-						     });*/
                         })
                     }
                 }).attr('stroke', '#0A0A0A');
@@ -456,7 +425,8 @@
             var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
             var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
             //添加一个矩形，并应用线性渐变
-            var colorRect = svg.append("rect").attr("x", 30).attr("y", 80).attr("width", 140).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
+			svg.append("rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
+            var colorRect = svg.append("rect").attr("x", 20).attr("y", 80).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
             //添加文字
             d3.selectAll("text").remove();
             var minValueText = svg.append("text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
@@ -495,7 +465,7 @@
             path = d3.geo.path().projection(xy);
             svg.attr('width', width).attr('height', height);
             //定义最小值和最大值对应的颜色
-            var a = d3.rgb(255, 255, 255); //浅蓝
+            var a = d3.rgb(255, 255, 255); //white
             //var a = d3.rgb(0,255,255);
             var b = d3.rgb(255, 0, 0); //
             //颜色插值函数
@@ -510,8 +480,10 @@
             d3.csv("all_country_export/" + objProduct.value + "_" + obj.value + ".csv", function(data) {
                 var ex = data;
                 //console.log(ex);
-                var tooltip = d3.select("body").append("div").attr("class", "tooltip") //用于css设置类样式
-                    .attr("opacity", 0.0);
+            var tooltip = d3.select("body")
+				.append("div")
+                .attr("class", "tooltip") //用于css设置类样式
+                .style("opacity", 0.0);
                 //====
                 var tooltip2 = d3.select("body").append("div").attr("class", "tooltip2").attr("opacity", 0.0);
                 //====
@@ -548,9 +520,9 @@
                 var linear = d3.scale.linear().domain([min, max]).range([0, 1]);
                 //console.log(exportData.length);
                 var areas = group.selectAll("path")
-                //.attr("d", path)
-                //.attr("class", "area")
-                    .transition().duration(200).attr("fill", function(d) {
+                    .transition()
+					.duration(200)
+					.attr("fill", function(d) {
                         var t = linear(norms[d.id]);
                         var color = computeColor(t);
                         //console.log(color);
@@ -558,7 +530,29 @@
                             return "#efefef";
                         }
                         return color.toString();
-                    }); //function(d){return color( )})
+                    })
+					group.selectAll("path").on('mouseout', function (data) {
+                        d3.select(this).attr('fill', function (d){
+                            tooltip.style("opacity",0.0);
+                            var t = linear(Math.log(values[d.id]));
+                            var color = computeColor(t);
+                            //console.log(color);
+                            if (color == "#NaNNaNNaN") {
+                                return "#efefef";
+                            }
+                            return color.toString();
+
+                        });
+                    })
+                    .on('mouseover', function (data) {
+                        //设置tooltip文字
+                        tooltip.html(data.id+":"+values[data.id])
+                        //设置tooltip的位置(left,top 相对于页面的距离)
+                            .style("left",(d3.event.pageX)+"px")
+                            .style("top",(d3.event.pageY+20)+"px")
+                            .style("opacity",1.0);
+                        d3.select(this).attr('fill', 'rgba(2,2,139,0.61)');
+                    });
                 //点击事件：
                 //定义一个线性渐变
                 var defs = svg.append("defs");
@@ -566,7 +560,8 @@
                 var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
                 var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
                 //添加一个矩形，并应用线性渐变
-                var colorRect = svg.append("rect").attr("x", 30).attr("y", 80).attr("width", 140).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
+				svg.append("rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
+				var colorRect = svg.append("rect").attr("x", 20).attr("y", 80).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
                 //添加文字
                 d3.selectAll("text").remove();
                 var minValueText = svg.append("text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
