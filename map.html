@@ -5,7 +5,7 @@
     .tooltip {
       font-family: simsun;
       font-size: 16px;
-      width: 140px;
+      width: 200px;
       height: auto;
       position: absolute;
       text-align: center;
@@ -120,8 +120,6 @@
         .style('position', 'absolute')
         .style('top', '40')
         .style('left', '0');
-
-
     var year_sel = d3.select('#year_div');
     var width_year = 200;
     var height_year = 100;
@@ -130,14 +128,10 @@
     //     .attr("width", width_year)
     //     .attr("height", height_year)
     //     .style('position', 'absolute');
-
-
-
     //Obtain 'year' and 'element' from the selection list
     var obj = document.getElementById('year_set');
     var objProduct = document.getElementById('product_set');
     var obj_year2 = document.getElementById('year_select2');
-
     //clear all the things
     d3.selectAll("g").remove();
     //read the map data to draw map
@@ -222,7 +216,6 @@
             var height=400;
             var svg4=d3.select("#container").append("svg").attr("width",400).attr("height",400).attr("id","svg4").style("position","absolute").style("top","300").style("left","1400");
 //画布周边的空白
-
             var padding = {left:30, right:30, top:20, bottom:20};
             var xScale=d3.scale.ordinal().domain(d3.extent(keyarray,function(d){
                 return keyarray;
@@ -266,20 +259,16 @@
                 .attr("class","axis")
                 .attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
                 .call(xAxis);
-
-
             svg4.append("text").attr("x", "183").attr("y", "30").style("font-size", "20px").text(function() {
                 console.log(svg4.text);
                 return "dasa";
             });
 //添加y轴
-
             svg4.append("g")
                 .attr("class","axis")
                 .attr("transform","translate(" + padding.left + "," + padding.top + ")")
                 .call(yAxis);
             //添加文字元素
-
             var text=svg4.selectAll("text")
                 .data(max5)
                 .enter()
@@ -301,7 +290,6 @@
                 .text(function(d){
                     return d;
                 });
-
             //--------
             //console.log(exportData.length);
             var areas = group.append("path")
@@ -330,7 +318,7 @@
                 })
                 .on('mouseover', function(data) {
                     //设置tooltip文字
-                    tooltip.html(data.id + ":" + values[data.id])
+                    tooltip.html(data.properties.name + ":" + values[data.id])
                     //设置tooltip的位置(left,top 相对于页面的距离)
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY + 20) + "px")
@@ -342,15 +330,11 @@
                 .on('click', function(data) {
                     //若点击的国家无数据，则不显示
                     d3.select("#container").select("#pro_select").remove();
-
                     d3.select("#container").select("#map_rect").remove();
                     d3.select("#container").select("#map_min_text").remove();
                     d3.select("#container").select("#map_max_text").remove();
                     d3.select("#container").select("#radient_rect").remove();
-
-
                     if (values[data.id] != undefined) {
-
                         var name ;
                         d3.select(this)
                             .attr('fill', function(d){
@@ -368,22 +352,20 @@
                             }) //function(d){return color( )})
                             .on('mouseout', function(data) {
                                 tooltip.style("opacity", 0.0);
-                              d3.select(this).attr('fill', function(d) {
+                                d3.select(this).attr('fill', function(d) {
                                     if (d.id == name)
                                         return 'rgba(2,2,139,0.61)';
                                     else return "#efefef";
-                              });
+                                });
                             })
                             .on('mouseover', function(data) {
                                 //设置tooltip文字
-                                tooltip.html(data.id + ":" + values[data.id])
+                                tooltip.html(data.properties.name+ ":" + values[data.id])
                                 //设置tooltip的位置(left,top 相对于页面的距离)
                                     .style("left", (d3.event.pageX) + "px")
                                     .style("top", (d3.event.pageY + 20) + "px")
                                     .style("opacity", 1.0);
                             });
-
-
                         //得到年份
                         var year = document.getElementById('year_set');
                         //console.log(year.value);
@@ -431,7 +413,6 @@
                                 }
                             }
                             var showdataname = ['Animal', 'Vegetable', 'FoodProd', 'Minerals', 'Fuels', 'Chemicals', 'PlastiRub', 'HidesSkin', 'Wood', 'TextCloth'];
-
                             //------------
                             //堆叠面积图的大小
                             var parseDate = d3.time.format("%Y").parse;
@@ -475,21 +456,18 @@
                             }))
                             var colorScale = d3.scale.ordinal().range(["#F37B6D", "#6CC071"]); //"#F37B6D", "#6CC071",
                             var hoverLabel = d3.scale.ordinal().range(["01-05_Animal", "06-15_Vegetable", "16-24_FoodProd", "25-26_Minerals", "27-27_Fuels", "28-38_Chemicals", "39-40_PlastiRub", "41-43_HidesSkin", "44-49_Wood", "50-63_TextCloth"]);
-
                             var yScale = d3.scale.linear().domain([1, 0]).range([0, height_stream]);//maxHeight
                             var yAxis = d3.svg.axis().scale(yScale)
                                 .ticks(8, ",f")
                                 .tickFormat(d3.format("%"))
                                 .orient("left");
                             var xBar = d3.svg.axis().scale(xScale).orient("bottom");
-
                             var yScale2 = d3.scale.linear().domain([maxHeight, 0]).range([0, height_stream]);//maxHeight
                             //console.log(d3.max(all_areaData));
                             var yAxis2 = d3.svg.axis().scale(yScale2)
                                 .ticks(8, ",f")
                                 .orient("right");
                             baseGroup.append("g").attr("class", "yaxis2").attr("transform", "translate("+width_stream+",0  )") .call(yAxis2);
-
                             d3.layout.stack()(newDataset);
                             baseGroup.append("g").attr("class", "xaxis").attr("transform", "translate(0," + height_stream + ")") //height_stream
                                 .call(xBar);
@@ -513,6 +491,10 @@
                                 .attr("class", function(d, i) {
                                     return hoverLabel(i);
                                 });
+                            console.log(data);
+                            proGroup.append("text").attr("x", "45").attr("y", "0").style("font-size", "15px")
+                                .style('fill',"black")
+                                .text("Stream Graph of "+data.properties.name+" though All years");
                             proGroup.append("path").attr("d", function(d) {
                                 return area(d);
                             })
@@ -529,6 +511,7 @@
                                     tooltip.style("opacity", 0.0);
                                 })
                                 //Click on one of the stack and a corresponding line chart appear
+
                                 .on('click', function(data) {
                                     d3.select("#container").select("#pro_select").remove();
                                     var proSelection = d3.select('#container')
@@ -558,7 +541,6 @@
                                     baseGroup.append("g").attr("class", "xaxis").attr("transform", "translate(0," + height_stream + ")") //height_stream
                                         .call(xBar);
                                     baseGroup.append("g").attr("class", "yaxis2").call(yAxis2);
-
                                     var Line = d3.svg.line()
                                         .x(function(d) {
                                             //console.log(d.x);
@@ -570,17 +552,18 @@
                                         })
                                         // 选择线条的类型
                                         .interpolate('linear'); // append path and calculate the value with function line
-
                                     console.log(data);
-
                                     baseGroup.append('path')
                                         .attr('class', 'Line')
                                         .attr('d', Line(data))
                                         .attr('fill', 'none')
                                         .attr('stroke-width', 3)
                                         .attr('stroke', 'green');
+                                    //title
+                                    baseGroup.append('text').attr("x", "45").attr("y", "0").style("font-size", "15px")
+                                        .style('fill',"black")
+                                        .text("Line Graph of "+ showdataname[0]+" though All years");
                                     var padding = {top: 20, right: 20, bottom:20, left:50};
-
                                     // draw dots
                                     baseGroup.selectAll("circle")
                                         .data(data)
@@ -617,7 +600,6 @@
                                                 .style("opacity", 0);
                                         });
                                 });
-
                             //draw pie chart
                             var pie = d3.layout.pie();
                             var piedata = pie(showdata);
@@ -639,7 +621,8 @@
                                 .outerRadius(outerRadius); //设置外半径
                             // var color = d3.scale.category20();   //有二十种颜色的颜色比例尺
                             //===
-                            svg2.append("text").attr("x", "203").attr("y", "50").style("font-size", "20px").text(data.id);
+                            svg2.append("text").attr("x", "105").attr("y", "20").style("font-size", "15px")
+                                .text("Export Values of All Categories in "+data.properties.name+" "+year.value);
                             //===
                             var shape = svg2.append("rect").attr("x", "520").attr("y", "20").attr("rx", "10").attr("ry", "10").attr("width", "150").attr("height", "320").attr('stroke', 'red').attr('stroke-width', '5px').attr("fill", "white");
                             var hint = svg2.selectAll("rect").data(piedata);
@@ -691,9 +674,7 @@
                                 //})
                             })
                                 .on("click",function(data,i){
-
                                     d3.select("#container").select("#stream").remove();
-
                                 });
                         })
                     }
@@ -707,7 +688,7 @@
             svg.append("rect").attr("id","map_rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
             var colorRect = svg.append("rect").attr("id","radient_rect").attr("x", 20).attr("y", 80).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
             //添加文字
-            svg.selectAll("text").remove();
+            //svg.selectAll("text").remove();
             var minValueText = svg.append("text").attr("id","map_min_text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
                 return minvalue;
             });
@@ -725,7 +706,6 @@
     function showSelectValue() {
         var obj = document.getElementById('year_set');
         var objProduct = document.getElementById('product_set');
-
         d3.select('#container').select("#svg2").remove();
         d3.select('#container').select("#stream").remove();
         d3.select('#container').select("#svg4").remove();
@@ -796,7 +776,6 @@
                     }
                 }
                 //--------
-
                 //---
                 //console.log(norms);
                 //console.log(normArray);
@@ -808,9 +787,7 @@
                 //console.log(values);
                 //console.log("attr", values[Object.keys(values)[21]]);
                 //console.log("attr", Object.getOwnPropertyNames(values)[16]);
-
                 ///---------
-
                 //--------
                 var max5=[];
                 var max5array=[];
@@ -909,7 +886,6 @@
                     .text(function(d){
                         return d;
                     });
-
                 var areas = group.selectAll("path")
                     .transition()
                     .duration(200)
@@ -954,7 +930,7 @@
                 svg.append("rect").attr("id","map_rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
                 var colorRect = svg.append("rect").attr("x", 20).attr("y", 80).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
                 //添加文字
-                svg.selectAll("text").remove();
+                //svg.selectAll("text").remove();
                 var minValueText = svg.append("text").attr("id","map_min_text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
                     return minvalue;
                 });
