@@ -47,54 +47,54 @@
 <body>
 <div id="container">
   <div class = "selection">
-  <select id="year_set" onchange="showSelectValue()">
-    <option selected="selected" value="2007">2007
-    </option>
-    <option value="2008">2008
-    </option>
-    <option value="2009">2009
-    </option>
-    <option value="2010">2010
-    </option>
-    <option value="2011">2011
-    </option>
-    <option value="2012">2012
-    </option>
-    <option value="2013">2013
-    </option>
-    <option value="2014">2014
-    </option>
-    <option value="2015">2015
-    </option>
-    <option value="2016">2016
-    </option>
-  </select>
+    <select id="year_set" onchange="showSelectValue()">
+      <option selected="selected" value="2007">2007
+      </option>
+      <option value="2008">2008
+      </option>
+      <option value="2009">2009
+      </option>
+      <option value="2010">2010
+      </option>
+      <option value="2011">2011
+      </option>
+      <option value="2012">2012
+      </option>
+      <option value="2013">2013
+      </option>
+      <option value="2014">2014
+      </option>
+      <option value="2015">2015
+      </option>
+      <option value="2016">2016
+      </option>
+    </select>
 
 
-  <select id="product_set" onchange="showSelectValue()">
-    <option selected="selected" value="Total">Total
-    </option>
-    <option value="01-05_Animal">Animal
-    </option>
-    <option value="06-15_Vegetable">Vegetable
-    </option>
-    <option value="16-24_FoodProd">FoodProd
-    </option>
-    <option value="25-26_Minerals">Minerals
-    </option>
-    <option value="27-27_Fuels">Fuels
-    </option>
-    <option value="28-38_Chemicals">Chemicals
-    </option>
-    <option value="39-40_PlastiRub">PlastiRub
-    </option>
-    <option value="41-43_HidesSkin">HidesSkin
-    </option>
-    <option value="44-49_Wood">Wood
-    </option>
-    <option value="50-63_TextCloth">TextCloth
-    </option>
-  </select>
+    <select id="product_set" onchange="showSelectValue()">
+      <option selected="selected" value="Total">Total
+      </option>
+      <option value="01-05_Animal">Animal
+      </option>
+      <option value="06-15_Vegetable">Vegetable
+      </option>
+      <option value="16-24_FoodProd">FoodProd
+      </option>
+      <option value="25-26_Minerals">Minerals
+      </option>
+      <option value="27-27_Fuels">Fuels
+      </option>
+      <option value="28-38_Chemicals">Chemicals
+      </option>
+      <option value="39-40_PlastiRub">PlastiRub
+      </option>
+      <option value="41-43_HidesSkin">HidesSkin
+      </option>
+      <option value="44-49_Wood">Wood
+      </option>
+      <option value="50-63_TextCloth">TextCloth
+      </option>
+    </select>
   </div>
 
 </div>
@@ -688,7 +688,7 @@
                                 //})
                             })
                                 .on("click",function(data,i){
-                                   d3.select("#container").select("#pro_select").remove();
+                                    d3.select("#container").select("#pro_select").remove();
                                     var proSelection = d3.select('#container')
                                         .append("svg");
                                     proSelection.attr("id", "pro_select")
@@ -774,28 +774,28 @@
                                                 .duration(500)
                                                 .style("opacity", 0);
                                         });
-                               });
+                                });
                         })
                     }
                 }).attr('stroke', '#0A0A0A');
             //定义一个线性渐变
             var defs = svg.append("defs").attr("id",'defs');
-                d3.select("#container").select("#radient_rect").remove();
-                var linearGradient = defs.append("linearGradient").attr("id", "linearColor").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
-                var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
-                var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
-                //添加一个矩形，并应用线性渐变
-                d3.select("#container").select("#map_rect").remove();
-                svg.append("rect").attr("id","map_rect").attr("x", 5).attr("y", 660).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
-                var colorRect = svg.append("rect").attr("id","radient_rect").attr("x", 20).attr("y", 680).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
-                //添加文字
-                svg.selectAll("text").remove();
-                var minValueText = svg.append("text").attr("id","map_min_text").attr("class", "valueText").attr("x", 10).attr("y", 720).attr("dy", "-0.3em").text(function() {
-                    return minvalue;
-                });
-                var maxValueText = svg.append("text").attr("id","map_max_text").attr("class", "valueText").attr("x", 140).attr("y", 720).attr("dy", "-0.3em").text(function() {
-                    return maxvalue;
-                });
+            d3.select("#container").select("#radient_rect").remove();
+            var linearGradient = defs.append("linearGradient").attr("id", "linearColor").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
+            var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
+            var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
+            //添加一个矩形，并应用线性渐变
+            d3.select("#container").select("#map_rect").remove();
+            svg.append("rect").attr("id","map_rect").attr("x", 5).attr("y", 660).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
+            var colorRect = svg.append("rect").attr("id","radient_rect").attr("x", 20).attr("y", 680).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
+            //添加文字
+            svg.selectAll("text").remove();
+            var minValueText = svg.append("text").attr("id","map_min_text").attr("class", "valueText").attr("x", 10).attr("y", 720).attr("dy", "-0.3em").text(function() {
+                return minvalue;
+            });
+            var maxValueText = svg.append("text").attr("id","map_max_text").attr("class", "valueText").attr("x", 140).attr("y", 720).attr("dy", "-0.3em").text(function() {
+                return maxvalue;
+            });
         })
     })
     //================
@@ -914,84 +914,84 @@
                 var svg4=d3.select("#container").append("svg").attr("width",500).attr("height",400).attr("id","svg4").style("position","absolute").style("top","230").style("left","600");
 //画布周边的空白
 
-            var padding = {left:120, right:30, top:40, bottom:20};
-            var xScale=d3.scale.ordinal().domain(d3.extent(keyarray,function(d){
-                return keyarray;
-            }))
-                .rangeRoundBands([0, width -40 - padding.right]);
-            /* var xScale=d3.scale.ordinal().domain(d3.range(max5array.length))
-                 .rangeRoundBands([0, width - padding.left - padding.right]);*/
-            var yScale = d3.scale.linear()
-                .domain([0,d3.max(max5array)])
-                .range([height - padding.top - padding.bottom, 0]);
+                var padding = {left:120, right:30, top:40, bottom:20};
+                var xScale=d3.scale.ordinal().domain(d3.extent(keyarray,function(d){
+                    return keyarray;
+                }))
+                    .rangeRoundBands([0, width -40 - padding.right]);
+                /* var xScale=d3.scale.ordinal().domain(d3.range(max5array.length))
+                     .rangeRoundBands([0, width - padding.left - padding.right]);*/
+                var yScale = d3.scale.linear()
+                    .domain([0,d3.max(max5array)])
+                    .range([height - padding.top - padding.bottom, 0]);
 //定义x轴
-            var xAxis = d3.svg.axis()
-                .scale(xScale)
-                .orient("bottom");
+                var xAxis = d3.svg.axis()
+                    .scale(xScale)
+                    .orient("bottom");
 //定义y轴
-            var yAxis = d3.svg.axis()
-                .scale(yScale)
-                .orient("left");
+                var yAxis = d3.svg.axis()
+                    .scale(yScale)
+                    .orient("left");
 //矩形之间的空白
-            var rectPadding = 40;
+                var rectPadding = 40;
 //添加矩形元素
-            var rects = svg4.selectAll(".MyRect")
-                .data(max5)
-                .enter()
-                .append("rect")
-                .attr("class","MyRect")
-                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
-                .attr("x", function(d,i){
-                    return 50*i + rectPadding/2;
-                } )
-                .attr("y",function(d,i){
-                    return yScale(max5[i]["value"]);
-                })
-                .attr("width", 40 )
-                .attr("height", function(d,i){
-                    return height - padding.top - padding.bottom - yScale(max5[i].value);
-                })
-                .attr("fill","red")
+                var rects = svg4.selectAll(".MyRect")
+                    .data(max5)
+                    .enter()
+                    .append("rect")
+                    .attr("class","MyRect")
+                    .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                    .attr("x", function(d,i){
+                        return 50*i + rectPadding/2;
+                    } )
+                    .attr("y",function(d,i){
+                        return yScale(max5[i]["value"]);
+                    })
+                    .attr("width", 40 )
+                    .attr("height", function(d,i){
+                        return height - padding.top - padding.bottom - yScale(max5[i].value);
+                    })
+                    .attr("fill","red")
 //添加x轴
-            svg4.append("g")
-                .attr("class","axis")
-                .attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
-                .call(xAxis);
+                svg4.append("g")
+                    .attr("class","axis")
+                    .attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
+                    .call(xAxis);
 
 
-            svg4.append("text").attr("x", "100").attr("y", "20").style("font-size", "20px").text(function() {
-                console.log(svg4.text);
-                return "Top 5 Countries with the Largest Export Amount";
-            });
+                svg4.append("text").attr("x", "100").attr("y", "20").style("font-size", "20px").text(function() {
+                    console.log(svg4.text);
+                    return "Top 5 Countries with the Largest Export Amount";
+                });
 //添加y轴
 
-            svg4.append("g")
-                .attr("class","axis")
-                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
-                .call(yAxis);
-            //添加文字元素
+                svg4.append("g")
+                    .attr("class","axis")
+                    .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                    .call(yAxis);
+                //添加文字元素
 
-            var text=svg4.selectAll("text")
-                .data(max5)
-                .enter()
-                .append("text")
-                //.attr("class","MyText")
-                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
-                .attr("x", function(d,i){
-                    return xScale(i) + rectPadding/2;
-                } )
-                .attr("y",function(d){
-                    return yScale(d);
-                })
-                .attr("dx",function(){
-                    return (xScale.rangeBand() - rectPadding)/2;
-                })
-                .attr("dy",function(d){
-                    return 20;
-                })
-                .text(function(d){
-                    return d;
-                });
+                var text=svg4.selectAll("text")
+                    .data(max5)
+                    .enter()
+                    .append("text")
+                    //.attr("class","MyText")
+                    .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                    .attr("x", function(d,i){
+                        return xScale(i) + rectPadding/2;
+                    } )
+                    .attr("y",function(d){
+                        return yScale(d);
+                    })
+                    .attr("dx",function(){
+                        return (xScale.rangeBand() - rectPadding)/2;
+                    })
+                    .attr("dy",function(d){
+                        return 20;
+                    })
+                    .text(function(d){
+                        return d;
+                    });
                 var areas = group.selectAll("path")
                     .transition()
                     .duration(200)
@@ -1019,11 +1019,11 @@
                 })
                     .on('mouseover', function (data) {
                         //设置tooltip文字
-                        tooltip.html(data.id+":"+values[data.id])
-                        //设置tooltip的位置(left,top 相对于页面的距离)
-                            .style("left",(d3.event.pageX)+"px")
-                            .style("top",(d3.event.pageY+20)+"px")
-                            .style("opacity",1.0);
+                        // tooltip.html(data.id+":"+values[data.id])
+                        // //设置tooltip的位置(left,top 相对于页面的距离)
+                        //     .style("left",(d3.event.pageX)+"px")
+                        //     .style("top",(d3.event.pageY+20)+"px")
+                        //     .style("opacity",1.0);
                         d3.select(this).attr('fill', 'rgba(2,2,139,0.61)');
                     });
                 //点击事件：
