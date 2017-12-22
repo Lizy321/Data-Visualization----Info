@@ -88,6 +88,33 @@
     </option>
   </select>
 
+
+  <div id = "year_div">
+    <select id="year_select2" onchange="showSelectValue()">
+      <option selected="selected" value="2007">2007
+      </option>
+      <option value="2008">2008
+      </option>
+      <option value="2009">2009
+      </option>
+      <option value="2010">2010
+      </option>
+      <option value="2011">2011
+      </option>
+      <option value="2012">2012
+      </option>
+      <option value="2013">2013
+      </option>
+      <option value="2014">2014
+      </option>
+      <option value="2015">2015
+      </option>
+      <option value="2016">2016
+      </option>
+    </select>
+
+  </div>
+
 </div>
 <svg>
   <radialgradient id="tip">
@@ -119,6 +146,18 @@
         .style('position', 'absolute')
         .style('top', '40')
         .style('left', '0');
+
+
+    var year_sel = d3.select('#container')
+        .select('#year_div');
+    var width_year = 20;
+    var height_year = 10;
+    year_sel.attr("width", width_year)
+        .attr("height", height_year)
+        .style('position', 'absolute')
+        .style('top', '40')
+        .style('left', '500');
+
     //Obtain 'year' and 'element' from the selection list
     var obj = document.getElementById('year_set');
     var objProduct = document.getElementById('product_set');
@@ -212,8 +251,8 @@
                 return keyarray;
             }))
                 .rangeRoundBands([0, width - padding.left - padding.right]);
-           /* var xScale=d3.scale.ordinal().domain(d3.range(max5array.length))
-                .rangeRoundBands([0, width - padding.left - padding.right]);*/
+            /* var xScale=d3.scale.ordinal().domain(d3.range(max5array.length))
+                 .rangeRoundBands([0, width - padding.left - padding.right]);*/
             var yScale = d3.scale.linear()
                 .domain([0,d3.max(max5array)])
                 .range([height - padding.top - padding.bottom, 0]);
@@ -325,10 +364,51 @@
                 //点击事件：
                 .on('click', function(data) {
                     //若点击的国家无数据，则不显示
+
+                    d3.select("#container").select("#map_rect").remove();
+                    d3.select("#container").select("#map_min_text").remove();
+                    d3.select("#container").select("#map_max_text").remove();
+                    d3.select("#container").select("#radient_rect").remove();
+
+
                     if (values[data.id] != undefined) {
+
+                        var name ;
+                        d3.select(this)
+                            .attr('fill', function(d){
+                                name = d.id;
+                                return 'rgba(2,2,139,0.61)';
+                            });
+                        areas.attr("id", "mapShape")
+                            .attr("d", path)
+                            .attr("class", "area")
+                            .attr("fill",function (data) {
+                                if (data.id != name){
+                                    return "#efefef"
+                                }
+                                else return 'rgba(2,2,139,0.61)';
+                            }) //function(d){return color( )})
+                            .on('mouseout', function(data) {
+                                tooltip.style("opacity", 0.0);
+                              d3.select(this).attr('fill', function(d) {
+                                    if (d.id == name)
+                                        return 'rgba(2,2,139,0.61)';
+                                    else return "#efefef";
+                              });
+                            })
+                            .on('mouseover', function(data) {
+                                //设置tooltip文字
+                                tooltip.html(data.id + ":" + values[data.id])
+                                //设置tooltip的位置(left,top 相对于页面的距离)
+                                    .style("left", (d3.event.pageX) + "px")
+                                    .style("top", (d3.event.pageY + 20) + "px")
+                                    .style("opacity", 1.0);
+                            });
+
+
                         //得到年份
                         var year = document.getElementById('year_set');
-                        console.log(year.value);
+                        //console.log(year.value);
                         d3.csv("all_product_export/" + data.id + "_all_product_ex.csv", function(productdata) {
                             //clear pie chart and stacked area chart
                             d3.select('#container').select("#svg2").remove();
@@ -372,6 +452,8 @@
                                     break;
                                 }
                             }
+                            var showdataname = ['Animal', 'Vegetable', 'FoodProd', 'Minerals', 'Fuels', 'Chemicals', 'PlastiRub', 'HidesSkin', 'Wood', 'TextCloth'];
+
                             //------------
                             //堆叠面积图的大小
                             var parseDate = d3.time.format("%Y").parse;
@@ -415,6 +497,7 @@
                             }))
                             var colorScale = d3.scale.ordinal().range(["#F37B6D", "#6CC071"]); //"#F37B6D", "#6CC071",
                             var hoverLabel = d3.scale.ordinal().range(["01-05_Animal", "06-15_Vegetable", "16-24_FoodProd", "25-26_Minerals", "27-27_Fuels", "28-38_Chemicals", "39-40_PlastiRub", "41-43_HidesSkin", "44-49_Wood", "50-63_TextCloth"]);
+
                             var yScale = d3.scale.linear().domain([1, 0]).range([0, height_stream]);//maxHeight
                             var yAxis = d3.svg.axis().scale(yScale)
                                 .ticks(8, ",f")
@@ -432,7 +515,7 @@
                             }).y1(function(d) {
                                 return yScale((d.y + d.y0)/maxHeight);
                             });
-                            var ageGroup = baseGroup.selectAll(".valgroup")
+                            var proGroup = baseGroup.selectAll(".valgroup")
                                 .data(newDataset)
                                 .enter()
                                 .append("g")
@@ -444,9 +527,110 @@
                                 .attr("class", function(d, i) {
                                     return hoverLabel(i);
                                 });
-                            ageGroup.append("path").attr("d", function(d) {
+                            proGroup.append("path").attr("d", function(d) {
                                 return area(d);
-                            });
+                            })
+                                .on('mouseover', function(data,i) {
+                                    //设置tooltip文字
+                                    //console.log(Label, Label[i]);
+                                    tooltip.html(showdataname[i])
+                                    //设置tooltip的位置(left,top 相对于页面的距离)
+                                        .style("left", (d3.event.pageX) + "px")
+                                        .style("top", (d3.event.pageY + 20) + "px")
+                                        .style("opacity", 1.0);
+                                })
+                                .on('mouseout', function(data) {
+                                    tooltip.style("opacity", 0.0);
+                                })
+                                //Click on one of the stack and a corresponding line chart appear
+                                .on('click', function(data) {
+                                    var proSelection = d3.select('#container')
+                                        .append("svg");
+                                    proSelection.attr("id", "pro_select")
+                                        .attr("width", width_stream + marginLeft + marginRight)
+                                        .attr("height", height_stream + marginTop + marginBottom)
+                                        .style('position', 'absolute')
+                                        .style('top', 50)
+                                        .style('left', 800);
+                                    var baseGroup = proSelection.append("g")
+                                        .attr("transform", "translate(" + marginLeft + "," + marginTop + ")");
+                                    var all_areaData = [];
+                                    var d = 0;
+                                    for (var k = 0; k < data.length; k++) {
+                                        console.log("data[k]:"+data[k]);
+                                        d = data[k].y;
+                                        all_areaData.push(d)
+                                    }
+                                    //console.log("max_data:" + all_areaData);
+                                    var maxHeight = d3.max(max_data);
+                                    var yScale2 = d3.scale.linear().domain([d3.max(all_areaData), 0]).range([0, height_stream]);//maxHeight
+                                    //console.log(d3.max(all_areaData));
+                                    var yAxis2 = d3.svg.axis().scale(yScale2)
+                                        .ticks(8, ",f")
+                                        .orient("right");
+                                    baseGroup.append("g").attr("class", "xaxis").attr("transform", "translate(0," + height_stream + ")") //height_stream
+                                        .call(xBar);
+                                    baseGroup.append("g").attr("class", "yaxis2").attr("transform", "translate("+width_stream+",0  )") .call(yAxis2);
+
+                                    var Line = d3.svg.line()
+                                        .x(function(d) {
+                                            //console.log(d.x);
+                                            return xScale(d.x);
+                                        })
+                                        .y(function(d) {
+                                            //console.log(d.y);
+                                            return yScale2(d.y);
+                                        })
+                                        // 选择线条的类型
+                                        .interpolate('linear'); // append path and calculate the value with function line
+
+                                    console.log(data);
+
+                                    baseGroup.append('path')
+                                        .attr('class', 'Line')
+                                        .attr('d', Line(data))
+                                        .attr('fill', 'none')
+                                        .attr('stroke-width', 3)
+                                        .attr('stroke', 'green');
+                                    var padding = {top: 20, right: 20, bottom:20, left:50};
+
+                                    // draw dots
+                                    baseGroup.selectAll("circle")
+                                        .data(data)
+                                        .enter().append("circle")
+                                        .attr("class", "dot")
+                                        .attr("r", function(d){
+                                            //console.log(d.x.getFullYear(),year.value);
+                                            if (d.x.getFullYear() == year.value){
+                                                return 7;
+                                            }
+                                            return 5;
+                                        })
+                                        .attr("cx", function(d){return xScale(d.x);})
+                                        .attr("cy", function(d){return yScale2(d.y);})
+                                        .style("fill", function(d){
+                                            //console.log(d.x.getFullYear(),year.value);
+                                            if (d.x.getFullYear() == year.value){
+                                                return 'red';
+                                            }
+                                            return 'green';
+                                        })
+                                        .on("mouseover", function(d) {
+                                            tooltip_area.transition()
+                                                .duration(200)
+                                                .style("opacity", .9);
+                                            tooltip_area.html((d.x.getFullYear())
+                                                + ": " + d.y )
+                                                .style("left", (d3.event.pageX + 5) + "px")
+                                                .style("top", (d3.event.pageY - 28) + "px");
+                                        })
+                                        .on("mouseout", function(d) {
+                                            tooltip_area.transition()
+                                                .duration(500)
+                                                .style("opacity", 0);
+                                        });
+                                });
+
                             //draw pie chart
                             var pie = d3.layout.pie();
                             var piedata = pie(showdata);
@@ -520,111 +704,27 @@
                                 //})
                             })
                                 .on("click",function(data,i){
+
                                     d3.select("#container").select("#stream").remove();
-                                    var svgSelection = d3.select('#container')
-                                        .append("svg");
-                                    svgSelection.attr("id", "stream")
-                                        .attr("width", width_stream + marginLeft + marginRight)
-                                        .attr("height", height_stream + marginTop + marginBottom)
-                                        .style('position', 'absolute')
-                                        .style('top', 400)
-                                        .style('left', 600);
-                                    var baseGroup = svgSelection.append("g")
-                                        .attr("transform", "translate(" + marginLeft + "," + marginTop + ")");
-                                    var all_areaData = [];
-                                    var d = 0;
-                                    for (var k = 0; k < newDataset[1].length; k++) {
-                                        d = newDataset[i][k].y;
-                                        all_areaData.push(d)
-                                    }
-                                    //console.log("max_data:" + all_areaData);
-                                    var maxHeight = d3.max(max_data);
-                                    var yScale2 = d3.scale.linear().domain([d3.max(all_areaData), 0]).range([0, height_stream]);//maxHeight
-                                    //console.log(d3.max(all_areaData));
-                                    var yAxis2 = d3.svg.axis().scale(yScale2)
-                                        .ticks(8, ",f")
-                                        .orient("right");
-                                    baseGroup.append("g").attr("class", "xaxis").attr("transform", "translate(0," + height_stream + ")") //height_stream
-                                        .call(xBar);
-                                    baseGroup.append("g").attr("class", "yaxis2").attr("transform", "translate("+width_stream+",0  )") .call(yAxis2);
-                                    var area = d3.svg.area().x(function(d) {
-                                        return xScale(d.x);
-                                    }).y0(function(d) {
-                                        return yScale(d.y0/maxHeight);
-                                    }).y1(function(d) {
-                                        return yScale((d.y + d.y0)/maxHeight);
-                                    });
-                                    var Line = d3.svg.line()
-                                        .x(function(d) {
-                                            //console.log(d.x);
-                                            return xScale(d.x);
-                                        })
-                                        .y(function(d) {
-                                            //console.log(d.y);
-                                            return yScale2(d.y);
-                                        })
-                                        // 选择线条的类型
-                                        .interpolate('linear'); // 添加path元素，并通过line()计算出值来赋值
-                                    baseGroup.append('path')
-                                        .attr('class', 'Line')
-                                        .attr('d', Line(newDataset[i]))
-                                        .attr('fill', 'none')
-                                        .attr('stroke-width', 3)
-                                        .attr('stroke', 'green');
-                                    var padding = {top: 20, right: 20, bottom:20, left:50};
-                                    // draw dots
-                                    baseGroup.selectAll("circle")
-                                        .data(newDataset[i])
-                                        .enter().append("circle")
-                                        .attr("class", "dot")
-                                        .attr("r", function(d){
-                                            //console.log(d.x.getFullYear(),year.value);
-                                            if (d.x.getFullYear() == year.value){
-                                                return 7;
-                                            }
-                                            return 5;
-                                        })
-                                        .attr("cx", function(d){return xScale(d.x);})
-                                        .attr("cy", function(d){return yScale2(d.y);})
-                                        .style("fill", function(d){
-                                            //console.log(d.x.getFullYear(),year.value);
-                                            if (d.x.getFullYear() == year.value){
-                                                return 'red';
-                                            }
-                                            return 'green';
-                                        })
-                                        .on("mouseover", function(d) {
-                                            tooltip_area.transition()
-                                                .duration(200)
-                                                .style("opacity", .9);
-                                            tooltip_area.html((d.x.getFullYear())
-                                                + ": " + d.y )
-                                                .style("left", (d3.event.pageX + 5) + "px")
-                                                .style("top", (d3.event.pageY - 28) + "px");
-                                        })
-                                        .on("mouseout", function(d) {
-                                            tooltip_area.transition()
-                                                .duration(500)
-                                                .style("opacity", 0);
-                                        });
+
                                 });
                         })
                     }
                 }).attr('stroke', '#0A0A0A');
             //定义一个线性渐变
-            var defs = svg.append("defs");
+            var defs = svg.append("defs").attr("id",'defs');
             var linearGradient = defs.append("linearGradient").attr("id", "linearColor").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
             var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
             var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
             //添加一个矩形，并应用线性渐变
-            svg.append("rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
-            var colorRect = svg.append("rect").attr("x", 20).attr("y", 80).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
+            svg.append("rect").attr("id","map_rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
+            var colorRect = svg.append("rect").attr("id","radient_rect").attr("x", 20).attr("y", 80).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
             //添加文字
-            //d3.selectAll("text").remove();
-            var minValueText = svg.append("text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
+            svg.selectAll("text").remove();
+            var minValueText = svg.append("text").attr("id","map_min_text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
                 return minvalue;
             });
-            var maxValueText = svg.append("text").attr("class", "valueText").attr("x", 140).attr("y", 120).attr("dy", "-0.3em").text(function() {
+            var maxValueText = svg.append("text").attr("id","map_max_text").attr("class", "valueText").attr("x", 140).attr("y", 120).attr("dy", "-0.3em").text(function() {
                 return maxvalue;
             });
         })
@@ -707,108 +807,7 @@
                     }
                 }
                 //--------
-			var max5=[];
-            var max5array=[];
-            var keyarray=[];
-            for(var i=5;i>0;i--){
-                var maxc=d3.entries(valueArray)
-                    .sort(function(a,b){
-                        return d3.descending(a.value, b.value);
-                    });
-                console.log(maxc[0]);
-                var c=[];
-                c["key"]=Object.keys(values)[maxc[0].key];
-                keyarray.push(Object.keys(values)[maxc[0].key]);
-                c["value"]=maxc[0].value;
-                max5.push(c);
-                max5array.push(maxc[0].value);
-                console.log(max5);
-                valueArray[maxc[0].key]=0;
-            }
-            console.log(max5);
-            var width=400;
-            var height=400;
-            var svg4=d3.select("#container").append("svg").attr("width",400).attr("height",400).attr("id","svg4").style("position","absolute").style("top","300").style("left","1400");
-//画布周边的空白
 
-            var padding = {left:30, right:30, top:20, bottom:20};
-            var xScale=d3.scale.ordinal().domain(d3.extent(keyarray,function(d){
-                return keyarray;
-            }))
-                .rangeRoundBands([0, width - padding.left - padding.right]);
-           /* var xScale=d3.scale.ordinal().domain(d3.range(max5array.length))
-                .rangeRoundBands([0, width - padding.left - padding.right]);*/
-            var yScale = d3.scale.linear()
-                .domain([0,d3.max(max5array)])
-                .range([height - padding.top - padding.bottom, 0]);
-//定义x轴
-            var xAxis = d3.svg.axis()
-                .scale(xScale)
-                .orient("bottom");
-//定义y轴
-            var yAxis = d3.svg.axis()
-                .scale(yScale)
-                .orient("left");
-//矩形之间的空白
-            var rectPadding = 40;
-//添加矩形元素
-            var rects = svg4.selectAll(".MyRect")
-                .data(max5)
-                .enter()
-                .append("rect")
-                .attr("class","MyRect")
-                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
-                .attr("x", function(d,i){
-                    return 50*i + rectPadding/2;
-                } )
-                .attr("y",function(d,i){
-                    return yScale(max5[i]["value"]);
-                })
-                .attr("width", 50 )
-                .attr("height", function(d,i){
-                    return height - padding.top - padding.bottom - yScale(max5[i].value);
-                })
-                .attr("fill","red")
-//添加x轴
-            svg4.append("g")
-                .attr("class","axis")
-                .attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
-                .call(xAxis);
-
-
-            svg4.append("text").attr("x", "183").attr("y", "30").style("font-size", "20px").text(function() {
-                console.log(svg4.text);
-                return "dasa";
-            });
-//添加y轴
-
-            svg4.append("g")
-                .attr("class","axis")
-                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
-                .call(yAxis);
-            //添加文字元素
-
-            var text=svg4.selectAll("text")
-                .data(max5)
-                .enter()
-                .append("text")
-                //.attr("class","MyText")
-                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
-                .attr("x", function(d,i){
-                    return xScale(i) + rectPadding/2;
-                } )
-                .attr("y",function(d){
-                    return yScale(d);
-                })
-                .attr("dx",function(){
-                    return (xScale.rangeBand() - rectPadding)/2;
-                })
-                .attr("dy",function(d){
-                    return 20;
-                })
-                .text(function(d){
-                    return d;
-                });
                 //---
                 //console.log(norms);
                 //console.log(normArray);
@@ -822,6 +821,106 @@
                 //console.log("attr", Object.getOwnPropertyNames(values)[16]);
 
                 ///---------
+
+                //--------
+                var max5=[];
+                var max5array=[];
+                var keyarray=[];
+                for(var i=5;i>0;i--){
+                    var maxc=d3.entries(valueArray)
+                        .sort(function(a,b){
+                            return d3.descending(a.value, b.value);
+                        });
+                    console.log(maxc[0]);
+                    var c=[];
+                    c["key"]=Object.keys(values)[maxc[0].key];
+                    keyarray.push(Object.keys(values)[maxc[0].key]);
+                    c["value"]=maxc[0].value;
+                    max5.push(c);
+                    max5array.push(maxc[0].value);
+                    console.log(max5);
+                    valueArray[maxc[0].key]=0;
+                }
+                console.log(max5);
+                var width=400;
+                var height=400;
+                var svg4=d3.select("#container").append("svg").attr("width",400).attr("height",400).attr("id","svg4").style("position","absolute").style("top","300").style("left","1400");
+//画布周边的空白
+                var padding = {left:30, right:30, top:20, bottom:20};
+                var xScale=d3.scale.ordinal().domain(d3.extent(keyarray,function(d){
+                    return keyarray;
+                }))
+                    .rangeRoundBands([0, width - padding.left - padding.right]);
+                /* var xScale=d3.scale.ordinal().domain(d3.range(max5array.length))
+                     .rangeRoundBands([0, width - padding.left - padding.right]);*/
+                var yScale = d3.scale.linear()
+                    .domain([0,d3.max(max5array)])
+                    .range([height - padding.top - padding.bottom, 0]);
+//定义x轴
+                var xAxis = d3.svg.axis()
+                    .scale(xScale)
+                    .orient("bottom");
+//定义y轴
+                var yAxis = d3.svg.axis()
+                    .scale(yScale)
+                    .orient("left");
+//矩形之间的空白
+                var rectPadding = 40;
+//添加矩形元素
+                var rects = svg4.selectAll(".MyRect")
+                    .data(max5)
+                    .enter()
+                    .append("rect")
+                    .attr("class","MyRect")
+                    .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                    .attr("x", function(d,i){
+                        return 50*i + rectPadding/2;
+                    } )
+                    .attr("y",function(d,i){
+                        return yScale(max5[i]["value"]);
+                    })
+                    .attr("width", 50 )
+                    .attr("height", function(d,i){
+                        return height - padding.top - padding.bottom - yScale(max5[i].value);
+                    })
+                    .attr("fill","red")
+//添加x轴
+                svg4.append("g")
+                    .attr("class","axis")
+                    .attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
+                    .call(xAxis);
+                svg4.append("text").attr("x", "183").attr("y", "30").style("font-size", "20px").text(function() {
+                    console.log(svg4.text);
+                    return "dasa";
+                });
+//添加y轴
+                svg4.append("g")
+                    .attr("class","axis")
+                    .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                    .call(yAxis);
+                //添加文字元素
+                var text=svg4.selectAll("text")
+                    .data(max5)
+                    .enter()
+                    .append("text")
+                    //.attr("class","MyText")
+                    .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                    .attr("x", function(d,i){
+                        return xScale(i) + rectPadding/2;
+                    } )
+                    .attr("y",function(d){
+                        return yScale(d);
+                    })
+                    .attr("dx",function(){
+                        return (xScale.rangeBand() - rectPadding)/2;
+                    })
+                    .attr("dy",function(d){
+                        return 20;
+                    })
+                    .text(function(d){
+                        return d;
+                    });
+
                 var areas = group.selectAll("path")
                     .transition()
                     .duration(200)
@@ -863,14 +962,14 @@
                 var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
                 var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
                 //添加一个矩形，并应用线性渐变
-                svg.append("rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
+                svg.append("rect").attr("id","map_rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
                 var colorRect = svg.append("rect").attr("x", 20).attr("y", 80).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
                 //添加文字
                 svg.selectAll("text").remove();
-                var minValueText = svg.append("text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
+                var minValueText = svg.append("text").attr("id","map_min_text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
                     return minvalue;
                 });
-                var maxValueText = svg.append("text").attr("class", "valueText").attr("x", 140).attr("y", 120).attr("dy", "-0.3em").text(function() {
+                var maxValueText = svg.append("text").attr("id","map_max_text").attr("class", "valueText").attr("x", 140).attr("y", 120).attr("dy", "-0.3em").text(function() {
                     return maxvalue;
                 });
                 /*group.append("titile")
