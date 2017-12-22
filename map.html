@@ -101,9 +101,9 @@
     var marginTop = 30;
     var marginBottom = 30;
     var marginRight = 150;
-    var marginLeft = 150;
+    var marginLeft = 100;
     var height_stream = 380 - marginTop - marginBottom;
-    var width_stream = 700 - marginLeft - marginRight;
+    var width_stream = 650 - marginLeft - marginRight;
     var height = 1000;
     var width = 1170;
     //var height = window.innerHeight * 1.8;
@@ -341,6 +341,7 @@
                 //点击事件：
                 .on('click', function(data) {
                     //若点击的国家无数据，则不显示
+                    d3.select("#container").select("#pro_select").remove();
 
                     d3.select("#container").select("#map_rect").remove();
                     d3.select("#container").select("#map_min_text").remove();
@@ -394,13 +395,13 @@
                             //Creating svg2 to draw pie chart
                             var svg2 = d3.select('#container')
                                 .append('svg');
-                            var width2 = 620;
+                            var width2 = 720;
                             var height2 = 400;
                             svg2.attr("width", width2)
                                 .attr("height", height2)
                                 .attr("id", "svg2")
                                 .style('position', 'absolute')
-                                .style('left', '600');
+                                .style('left', '400');
                             //creating svg3 to draw stacked area chart
                             var svgSelection = d3.select('#container')
                                 .append("svg");
@@ -409,7 +410,7 @@
                                 .attr("height", height_stream + marginTop + marginBottom)
                                 .style('position', 'absolute')
                                 .style('top', 360)
-                                .style('left', 450);
+                                .style('left', 400);
                             for (var i = 0; i < ex.length; i++) {
                                 if (year.value == productdata[i].year) {
                                     var showdata = [];
@@ -631,39 +632,39 @@
                             piedata[8].data = "Wood";
                             piedata[9].data = "TextCloth";
                             console.log(piedata);
-                            var outerRadius = 140; //外半径
+                            var outerRadius = 110; //外半径
                             var innerRadius = 0; //内半径，为0则中间没有空白
                             var arc = d3.svg.arc() //弧生成器
                                 .innerRadius(innerRadius) //设置内半径
                                 .outerRadius(outerRadius); //设置外半径
                             // var color = d3.scale.category20();   //有二十种颜色的颜色比例尺
                             //===
-                            svg2.append("text").attr("x", "183").attr("y", "30").style("font-size", "20px").text(data.id);
+                            svg2.append("text").attr("x", "203").attr("y", "50").style("font-size", "20px").text(data.id);
                             //===
-                            var shape = svg2.append("rect").attr("x", "450").attr("y", "45").attr("rx", "10").attr("ry", "10").attr("width", "150").attr("height", "320").attr('stroke', 'red').attr('stroke-width', '5px').attr("fill", "white");
+                            var shape = svg2.append("rect").attr("x", "520").attr("y", "20").attr("rx", "10").attr("ry", "10").attr("width", "150").attr("height", "320").attr('stroke', 'red').attr('stroke-width', '5px').attr("fill", "white");
                             var hint = svg2.selectAll("rect").data(piedata);
-                            hint.enter().append("rect").attr("x", "470").attr("y", function(d, i) {
-                                return 30 + 30 * i;
+                            hint.enter().append("rect").attr("x", "540").attr("y", function(d, i) {
+                                return  30 * i;
                             }).attr("width", "50").attr("height", "25").attr("fill", function(d, i) {
                                 return color(i);
                             });
-                            svg2.append("rect").attr("x", "470").attr("y", function(d, i) {
-                                return 30 + 30 *10;
+                            svg2.append("rect").attr("x", "540").attr("y", function(d, i) {
+                                return  30 *10;
                             }).attr("width", "50").attr("height", "25").attr("fill", function(d, i) {
                                 return color(0);
                             });
                             var hinttext = svg2.selectAll("text").data(piedata);
-                            hinttext.enter().append("text").attr("x", "530").attr("y", function(d, i) {
-                                return 45 + 30 * i;
+                            hinttext.enter().append("text").attr("x", "600").attr("y", function(d, i) {
+                                return 25 + 30 * i;
                             }).style("font-size", "12px").text(function(d, i) {
                                 return d.data;
                             });
-                            svg2.append("text").attr("x", "530").attr("y", function(d, i) {
-                                return 45 + 30 * 10;
+                            svg2.append("text").attr("x", "600").attr("y", function(d, i) {
+                                return 25 + 30 * 10;
                             }).style("font-size", "12px").text(function(d, i) {
                                 return piedata[0].data;
                             });
-                            var arcs = svg2.selectAll("g").data(piedata).enter().append("g").attr("transform", "translate(" + 205 + "," + 210 + ")");
+                            var arcs = svg2.selectAll("g").data(piedata).enter().append("g").attr("transform", "translate(" + 225 + "," + 180 + ")");
                             //.attr("transform","translate("+ (width2/2) +","+ (width2/2) +")");
                             //console.log("yes");
                             arcs.append("path").attr("fill", function(d, i) {
@@ -728,6 +729,7 @@
         d3.select('#container').select("#svg2").remove();
         d3.select('#container').select("#stream").remove();
         d3.select('#container').select("#svg4").remove();
+        d3.select("#container").select("#pro_select").remove();
         //d3.selectAll("g")
         //    .remove();
         //console.log(objProduct.value);
@@ -741,7 +743,7 @@
             var projection = d3.geo.mercator();
             var oldScala = projection.scale();
             var oldTranslate = projection.translate();
-            xy = projection.scale(oldScala * (width / oldTranslate[0] / 2) * 2.0).translate([width / 2 - 800, height / 2 + 300]); //CENTER
+            xy = projection.scale(oldScala * (width / oldTranslate[0] / 2) * 2.0).translate([width / 2 - 500, height / 2 + 300]); //CENTER
             path = d3.geo.path().projection(xy);
             svg.attr('width', width).attr('height', height);
             //定义最小值和最大值对应的颜色
