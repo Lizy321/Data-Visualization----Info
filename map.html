@@ -695,20 +695,22 @@
                 }).attr('stroke', '#0A0A0A');
             //定义一个线性渐变
             var defs = svg.append("defs").attr("id",'defs');
-            var linearGradient = defs.append("linearGradient").attr("id", "linearColor").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
-            var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
-            var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
-            //添加一个矩形，并应用线性渐变
-            svg.append("rect").attr("id","map_rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
-            var colorRect = svg.append("rect").attr("id","radient_rect").attr("x", 20).attr("y", 80).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
-            //添加文字
-            //svg.selectAll("text").remove();
-            var minValueText = svg.append("text").attr("id","map_min_text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
-                return minvalue;
-            });
-            var maxValueText = svg.append("text").attr("id","map_max_text").attr("class", "valueText").attr("x", 140).attr("y", 120).attr("dy", "-0.3em").text(function() {
-                return maxvalue;
-            });
+                d3.select("#container").select("#radient_rect").remove();
+                var linearGradient = defs.append("linearGradient").attr("id", "linearColor").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
+                var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
+                var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
+                //添加一个矩形，并应用线性渐变
+                d3.select("#container").select("#map_rect").remove();
+                svg.append("rect").attr("id","map_rect").attr("x", 5).attr("y", 660).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
+                var colorRect = svg.append("rect").attr("id","radient_rect").attr("x", 20).attr("y", 680).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
+                //添加文字
+                svg.selectAll("text").remove();
+                var minValueText = svg.append("text").attr("id","map_min_text").attr("class", "valueText").attr("x", 10).attr("y", 720).attr("dy", "-0.3em").text(function() {
+                    return minvalue;
+                });
+                var maxValueText = svg.append("text").attr("id","map_max_text").attr("class", "valueText").attr("x", 140).attr("y", 720).attr("dy", "-0.3em").text(function() {
+                    return maxvalue;
+                });
         })
     })
     //================
@@ -941,19 +943,21 @@
                     });
                 //点击事件：
                 //定义一个线性渐变
-                var defs = svg.append("defs");
+                var defs = svg.append("defs").attr("id",'defs');
+                d3.select("#container").select("#radient_rect").remove();
                 var linearGradient = defs.append("linearGradient").attr("id", "linearColor").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
                 var stop1 = linearGradient.append("stop").attr("offset", "0%").style("stop-color", a.toString());
                 var stop2 = linearGradient.append("stop").attr("offset", "100%").style("stop-color", b.toString());
                 //添加一个矩形，并应用线性渐变
-                svg.append("rect").attr("id","map_rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
-                var colorRect = svg.append("rect").attr("x", 20).attr("y", 80).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
+                d3.select("#container").select("#map_rect").remove();
+                svg.append("rect").attr("id","map_rect").attr("x", 5).attr("y", 660).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
+                var colorRect = svg.append("rect").attr("id","radient_rect").attr("x", 20).attr("y", 680).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
                 //添加文字
-                //svg.selectAll("text").remove();
-                var minValueText = svg.append("text").attr("id","map_min_text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
+                svg.selectAll("text").remove();
+                var minValueText = svg.append("text").attr("id","map_min_text").attr("class", "valueText").attr("x", 10).attr("y", 720).attr("dy", "-0.3em").text(function() {
                     return minvalue;
                 });
-                var maxValueText = svg.append("text").attr("id","map_max_text").attr("class", "valueText").attr("x", 140).attr("y", 120).attr("dy", "-0.3em").text(function() {
+                var maxValueText = svg.append("text").attr("id","map_max_text").attr("class", "valueText").attr("x", 140).attr("y", 720).attr("dy", "-0.3em").text(function() {
                     return maxvalue;
                 });
                 /*group.append("titile")
