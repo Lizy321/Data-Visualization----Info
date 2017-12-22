@@ -336,7 +336,7 @@
                 })
                 .on('mouseover', function(data) {
                     //设置tooltip文字
-                    tooltip.html(data.properties.name + ":" + (values[data.id] / 1000000).toFixed(2) + "M")
+                    tooltip.html(data.properties.name + ": " + objProduct.value +"$" + (values[data.id] / 1000000).toFixed(2) + "M")
                     //设置tooltip的位置(left,top 相对于页面的距离)
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY + 20) + "px")
@@ -378,7 +378,7 @@
                             })
                             .on('mouseover', function(data) {
                                 //设置tooltip文字
-                                tooltip.html(data.properties.name+ ":" + (values[data.id] / 1000000).toFixed(2) + "M" )
+                                tooltip.html(data.properties.name+ ":" + objProduct.value +" $" + (values[data.id] / 1000000).toFixed(2) + "M" )
                                 //设置tooltip的位置(left,top 相对于页面的距离)
                                     .style("left", (d3.event.pageX) + "px")
                                     .style("top", (d3.event.pageY + 20) + "px")
