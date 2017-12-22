@@ -707,7 +707,108 @@
                     }
                 }
                 //--------
+			var max5=[];
+            var max5array=[];
+            var keyarray=[];
+            for(var i=5;i>0;i--){
+                var maxc=d3.entries(valueArray)
+                    .sort(function(a,b){
+                        return d3.descending(a.value, b.value);
+                    });
+                console.log(maxc[0]);
+                var c=[];
+                c["key"]=Object.keys(values)[maxc[0].key];
+                keyarray.push(Object.keys(values)[maxc[0].key]);
+                c["value"]=maxc[0].value;
+                max5.push(c);
+                max5array.push(maxc[0].value);
+                console.log(max5);
+                valueArray[maxc[0].key]=0;
+            }
+            console.log(max5);
+            var width=400;
+            var height=400;
+            var svg4=d3.select("#container").append("svg").attr("width",400).attr("height",400).attr("id","svg4").style("position","absolute").style("top","300").style("left","1400");
+//画布周边的空白
 
+            var padding = {left:30, right:30, top:20, bottom:20};
+            var xScale=d3.scale.ordinal().domain(d3.extent(keyarray,function(d){
+                return keyarray;
+            }))
+                .rangeRoundBands([0, width - padding.left - padding.right]);
+           /* var xScale=d3.scale.ordinal().domain(d3.range(max5array.length))
+                .rangeRoundBands([0, width - padding.left - padding.right]);*/
+            var yScale = d3.scale.linear()
+                .domain([0,d3.max(max5array)])
+                .range([height - padding.top - padding.bottom, 0]);
+//定义x轴
+            var xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("bottom");
+//定义y轴
+            var yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+//矩形之间的空白
+            var rectPadding = 40;
+//添加矩形元素
+            var rects = svg4.selectAll(".MyRect")
+                .data(max5)
+                .enter()
+                .append("rect")
+                .attr("class","MyRect")
+                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                .attr("x", function(d,i){
+                    return 50*i + rectPadding/2;
+                } )
+                .attr("y",function(d,i){
+                    return yScale(max5[i]["value"]);
+                })
+                .attr("width", 50 )
+                .attr("height", function(d,i){
+                    return height - padding.top - padding.bottom - yScale(max5[i].value);
+                })
+                .attr("fill","red")
+//添加x轴
+            svg4.append("g")
+                .attr("class","axis")
+                .attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
+                .call(xAxis);
+
+
+            svg4.append("text").attr("x", "183").attr("y", "30").style("font-size", "20px").text(function() {
+                console.log(svg4.text);
+                return "dasa";
+            });
+//添加y轴
+
+            svg4.append("g")
+                .attr("class","axis")
+                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                .call(yAxis);
+            //添加文字元素
+
+            var text=svg4.selectAll("text")
+                .data(max5)
+                .enter()
+                .append("text")
+                //.attr("class","MyText")
+                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                .attr("x", function(d,i){
+                    return xScale(i) + rectPadding/2;
+                } )
+                .attr("y",function(d){
+                    return yScale(d);
+                })
+                .attr("dx",function(){
+                    return (xScale.rangeBand() - rectPadding)/2;
+                })
+                .attr("dy",function(d){
+                    return 20;
+                })
+                .text(function(d){
+                    return d;
+                });
                 //---
                 //console.log(norms);
                 //console.log(normArray);
@@ -765,7 +866,7 @@
                 svg.append("rect").attr("x", 5).attr("y", 60).attr("width", 245).attr("height", 70).style("fill", "white").attr('stroke', '#000000').attr('stroke-width', '2px').attr('rx','5').attr('ry','5');
                 var colorRect = svg.append("rect").attr("x", 20).attr("y", 80).attr("width", 210).attr("height", 20).style("fill", "url(#" + linearGradient.attr("id") + ")");
                 //添加文字
-                d3.selectAll("text").remove();
+                svg.selectAll("text").remove();
                 var minValueText = svg.append("text").attr("class", "valueText").attr("x", 10).attr("y", 120).attr("dy", "-0.3em").text(function() {
                     return minvalue;
                 });
