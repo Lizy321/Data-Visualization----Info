@@ -195,8 +195,7 @@
             var linear = d3.scale.linear()
                 .domain([min, max])
                 .range([0, 1]);
-            //--------
-// Draw bar chart
+			// Draw bar chart
             //Extract the top 5 value
             var max5=[];
             var max5array=[];
@@ -297,7 +296,7 @@
                 .text(function(d){
                     return d;
                 });
-            //--------
+            
             //console.log(exportData.length);
             //Draw maps
             var areas = group.append("path")
@@ -419,7 +418,6 @@
                                     break;
                                 }
                             }
-                            //------------
                             //Draw stream graphs
                             //Calculate the area for stacks
                             var parseDate = d3.time.format("%Y").parse;
@@ -659,8 +657,6 @@
                                 return piedata[0].data;
                             });
                             var arcs = svg2.selectAll("g").data(piedata).enter().append("g").attr("transform", "translate(" + 225 + "," + 180 + ")");
-                            //.attr("transform","translate("+ (width2/2) +","+ (width2/2) +")");
-                            //console.log("yes");
                             arcs.append("path").attr("fill", function(d, i) {
                                 var num = 2 * i + 1;
                                 console.log(num);
@@ -720,7 +716,7 @@
                                             //console.log(d.y);
                                             return yScale2(d.y);
                                         })
-                                        // 选择线条的类型
+                                        
                                         .interpolate('linear'); // append path and calculate the value with function line
                                     //console.log(data);
                                     baseGroup.append('path')
@@ -792,11 +788,7 @@
             });
         })
     });
-    //Call selected functions
-    function showPieChart() {
-        var obj = document.getElementById('year_select2');
-        console.log(obj.value);
-    }
+    //This function would be called when selecting a new option of the pull-down menus
     function showSelectValue() {
         var obj = document.getElementById('year_set');
         var objProduct = document.getElementById('product_set');
@@ -807,7 +799,6 @@
 
         d3.json("world-countries.json", function(data) {
             var group = svg.selectAll("g").data(data.features);
-            //.enter()
             var projection = d3.geo.mercator();
             var oldScala = projection.scale();
             var oldTranslate = projection.translate();
@@ -824,9 +815,9 @@
                     .append("div")
                     .attr("class", "tooltip")
                     .style("opacity", 0.0);
-                //====
+
                 var tooltip2 = d3.select("body").append("div").attr("class", "tooltip2").attr("opacity", 0.0);
-                //====
+
                 var values = [];
                 var valueArray = [];
                 var norms = [];
@@ -839,7 +830,7 @@
                         valueArray.push(value * 1000 / 1000);
                     }
                 }
-                //console.log(valueArray);
+                
                 var maxvalue = d3.max(valueArray);
                 var minvalue = d3.min(valueArray);
                 console.log(maxvalue);
@@ -853,20 +844,11 @@
                         normArray.push((nvalue * 1000 - minvalue * 1000) / (maxvalue * 1000));1
                     }
                 }
-                //--------
-                //---
-                //console.log(norms);
-                //console.log(normArray);
+
                 var min = d3.min(normArray);
                 var max = d3.max(normArray);
                 var linear = d3.scale.linear().domain([min, max]).range([0, 1]);
-                //console.log(exportData.length);
-                //console.log(valueArray);
-                //console.log(values);
-                //console.log("attr", values[Object.keys(values)[21]]);
-                //console.log("attr", Object.getOwnPropertyNames(values)[16]);
-                ///---------
-                //--------
+
                 var max5=[];
                 var max5array=[];
                 var keyarray=[];
@@ -895,8 +877,7 @@
                     return keyarray;
                 }))
                     .rangeRoundBands([0, width -40 - padding.right]);
-                /* var xScale=d3.scale.ordinal().domain(d3.range(max5array.length))
-                     .rangeRoundBands([0, width - padding.left - padding.right]);*/
+					
                 var yScale = d3.scale.linear()
                     .domain([0,d3.max(max5array)])
                     .range([height - padding.top - padding.bottom, 0]);
@@ -951,7 +932,7 @@
                     .data(max5)
                     .enter()
                     .append("text")
-                    //.attr("class","MyText")
+                    
                     .attr("transform","translate(" + padding.left + "," + padding.top + ")")
                     .attr("x", function(d,i){
                         return xScale(i) + rectPadding/2;
@@ -985,8 +966,7 @@
                         tooltip.style("opacity",0.0);
                         var t = linear(norms[data.id]);
                         var color = computeColor(t);
-                        //console.log(color.toString());
-                        //console.log(color);
+
                         if (color == "#NaNNaNNaN") {
                             return "#efefef";
                         }
