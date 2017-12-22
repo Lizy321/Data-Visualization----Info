@@ -688,8 +688,92 @@
                                 //})
                             })
                                 .on("click",function(data,i){
-                                    d3.select("#container").select("#stream").remove();
-                                });
+                                   d3.select("#container").select("#pro_select").remove();
+                                    var proSelection = d3.select('#container')
+                                        .append("svg");
+                                    proSelection.attr("id", "pro_select")
+                                        .attr("width", width_stream + marginLeft + marginRight)
+                                        .attr("height", height_stream + marginTop + marginBottom)
+                                        .style('position', 'absolute')
+                                        .style('top', 360)
+                                        .style('left', 1050);
+                                    var baseGroup = proSelection.append("g")
+                                        .attr("transform", "translate(" + marginLeft + "," + marginTop + ")");
+                                    var all_areaData = [];
+                                    var d = 0;
+                                    for (var k = 0; k < newDataset[i].length; k++) {
+                                        //console.log("data[k]:"+data[k]);
+                                        d = newDataset[i][k].y;
+                                        all_areaData.push(d)
+                                    }
+                                    //console.log("max_data:" + all_areaData);
+                                    var maxHeight = d3.max(max_data);
+                                    var yScale2 = d3.scale.linear().domain([d3.max(all_areaData), 0]).range([0, height_stream]);//maxHeight
+                                    //console.log(d3.max(all_areaData));
+                                    var yAxis2 = d3.svg.axis().scale(yScale2)
+                                        .ticks(8, ",f")
+                                        .orient("left");
+                                    baseGroup.append("g").attr("class", "xaxis").attr("transform", "translate(0," + height_stream + ")") //height_stream
+                                        .call(xBar);
+                                    baseGroup.append("g").attr("class", "yaxis2").call(yAxis2);
+
+                                    var Line = d3.svg.line()
+                                        .x(function(d) {
+                                            //console.log(d.x);
+                                            return xScale(d.x);
+                                        })
+                                        .y(function(d) {
+                                            //console.log(d.y);
+                                            return yScale2(d.y);
+                                        })
+                                        // 选择线条的类型
+                                        .interpolate('linear'); // append path and calculate the value with function line
+
+                                    //console.log(data);
+
+                                    baseGroup.append('path')
+                                        .attr('class', 'Line')
+                                        .attr('d', Line(newDataset[i]))
+                                        .attr('fill', 'none')
+                                        .attr('stroke-width', 3)
+                                        .attr('stroke', 'green');
+                                    var padding = {top: 20, right: 20, bottom:20, left:50};
+
+                                    // draw dots
+                                    baseGroup.selectAll("circle")
+                                        .data(newDataset[i])
+                                        .enter().append("circle")
+                                        .attr("class", "dot")
+                                        .attr("r", function(d){
+                                            //console.log(d.x.getFullYear(),year.value);
+                                            if (d.x.getFullYear() == year.value){
+                                                return 7;
+                                            }
+                                            return 5;
+                                        })
+                                        .attr("cx", function(d){return xScale(d.x);})
+                                        .attr("cy", function(d){return yScale2(d.y);})
+                                        .style("fill", function(d){
+                                            //console.log(d.x.getFullYear(),year.value);
+                                            if (d.x.getFullYear() == year.value){
+                                                return 'red';
+                                            }
+                                            return 'green';
+                                        })
+                                        .on("mouseover", function(d) {
+                                            tooltip_area.transition()
+                                                .duration(200)
+                                                .style("opacity", .9);
+                                            tooltip_area.html((d.x.getFullYear())
+                                                + ": " + d.y )
+                                                .style("left", (d3.event.pageX + 5) + "px")
+                                                .style("top", (d3.event.pageY - 28) + "px");
+                                        })
+                                        .on("mouseout", function(d) {
+                                            tooltip_area.transition()
+                                                .duration(500)
+                                                .style("opacity", 0);
+                                        });
                         })
                     }
                 }).attr('stroke', '#0A0A0A');
