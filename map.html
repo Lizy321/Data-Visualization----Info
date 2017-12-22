@@ -750,6 +750,9 @@
                                         .attr('fill', 'none')
                                         .attr('stroke-width', 3)
                                         .attr('stroke', 'green');
+                                    baseGroup.append('text').attr("x", "45").attr("y", "0").style("font-size", "15px")
+                                        .style('fill',"black")
+                                        .text("Line Graph of "+ showdataname[0]+" through All years (USD $)");
                                     var padding = {top: 20, right: 20, bottom:20, left:50};
 
                                     // draw dots
